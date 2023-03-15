@@ -1,0 +1,37 @@
+version: '3'
+
+networks:
+    filmcom-ticketing-network:
+
+volumes:
+    mysql_data:
+        driver: local
+
+services:
+    mysql:
+        image: mysql:5.7.22
+        restart: unless-stopped
+        networks: 
+            - filmcom-ticketing-network
+        tty: true
+        ports:
+            - "3306:3306"
+        volumes:
+            - mysql_data:/var/lib/mysql
+        environment: 
+            MYSQL_DATABASE: filmcom-ticketing
+            MYSQL_USER: root
+            MYSQL_PASSWORD: root
+            MYSQL_ROOT_PASSWORD: root
+
+    php:
+        build: .
+        networks:
+            - filmcom-ticketing-network
+        volumes:
+            - ./src:/var/www/html
+        depends_on: 
+            - mysql
+        command: php artisan serve --host=0.0.0.0 --port=9000
+        ports:
+            - "9098:9000"
