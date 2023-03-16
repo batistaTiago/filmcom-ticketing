@@ -38,6 +38,7 @@ class MysqlExhibitionRepository implements ExhibitionRepositoryInterface
     {
         return Exhibition::query()
             ->where(compact('day_of_week', 'theater_room_id'))
+            ->where('is_active', true)
             ->get()
             ->map(fn (Exhibition $exhibition) => $exhibition->toDTO());
     }

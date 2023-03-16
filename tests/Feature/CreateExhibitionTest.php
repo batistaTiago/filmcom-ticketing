@@ -38,34 +38,40 @@ class CreateExhibitionTest extends TestCase
         $this->assertDatabaseCount('exhibitions', 0);
     }
 
-    // TODO adicionar dataProvider
-    /** @test */
-    public function should_reject_the_exhibition_if_a_session_time_conflict_is_found()
-    {
+    /**
+     * @test
+     * @dataProvider exhibitionConflictValidationData
+     */
+    public function should_reject_the_exhibition_if_a_session_time_conflict_is_found(
+        $duration,
+        $starts_at,
+        $is_active,
+        $expectedStatus,
+    ) {
         $times = collect(['10:00', '15:00', '19:00']);
         $room = TheaterRoom::factory()->create();
         $films = Film::factory()->times(3)->create(['duration' => 120]);
 
-        $times->map(function ($time, $index) use ($room, $films) {
+        $times->map(function ($time, $index) use ($room, $films, $is_active) {
             return Exhibition::factory()->create([
                 'film_id' => $films[$index]->uuid,
                 'theater_room_id' => $room->uuid,
                 'starts_at' => Carbon::parse($time),
                 'day_of_week' => CarbonInterface::SUNDAY,
-                'is_active' => true
+                'is_active' => $is_active
             ]);
         });
 
-        $newFilm = Film::factory()->create(['duration' => 120]);
+        $newFilm = Film::factory()->create(compact('duration'));
 
         $this->postJson(route('api.exhibitions.create'), [
             'film_id' => $newFilm->uuid,
             'theater_room_id' => $room->uuid,
-            'starts_at' => '09:59',
+            'starts_at' => $starts_at,
             'day_of_week' => CarbonInterface::SUNDAY,
             'is_active' => true,
         ])
-            ->assertBadRequest();
+            ->assertStatus($expectedStatus);
     }
 
     public static function validExhibitionData(): array
@@ -131,6 +137,22 @@ class CreateExhibitionTest extends TestCase
                     'is_active' => true,
                 ],
             ]
+        ];
+    }
+
+    public static function exhibitionConflictValidationData(): array
+    {
+        return [
+            [120, '07:00', true, 201],
+            [120, '12:30', true, 201],
+            [120, '21:30', true, 201],
+            [30, '09:59', true, 400],
+            [180, '14:59', true, 400],
+            [600, '14:30', true, 400],
+
+            [30, '09:59', false, 201],
+            [180, '14:59', false, 201],
+            [600, '14:30', false, 201],
         ];
     }
 }

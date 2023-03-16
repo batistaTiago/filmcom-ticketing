@@ -3,6 +3,7 @@
 namespace App\UseCases;
 
 use App\Domain\DTO\ExhibitionDTO;
+use App\Domain\DTO\FilmDTO;
 use App\Domain\Repositories\ExhibitionRepositoryInterface;
 use App\Domain\Repositories\FilmRepositoryInterface;
 use Carbon\Carbon;
@@ -18,37 +19,48 @@ class CreateExhibitionUseCase
 
     public function execute(array $data): ExhibitionDTO
     {
-        $day_of_week = $data['day_of_week'];
-        $theater_room_id = $data['theater_room_id'];
-        $film_id = $data['film_id'];
+        $newExhibition = ExhibitionDTO::fromArray($data);
+        $this->validateRoomAvailability($newExhibition);
+        $this->exhibitionRepository->create($newExhibition);
+        return $newExhibition;
+    }
 
-        $exhibitionFilm = $this->filmRepository->findByUuid($film_id);
+    private function validateRoomAvailability(ExhibitionDTO $newExhibition): void
+    {
+        $currentExhibitions = $this->exhibitionRepository
+            ->getDailyExhibitionsInRoom($newExhibition->day_of_week, $newExhibition->theater_room_id);
 
-        $exhibitionStartsAt = Carbon::parse($data['starts_at']);
-        $exhibitionEndsAt = $exhibitionStartsAt->clone()->addMinutes($exhibitionFilm->duration);
+        $dailyRoomFilms = $this->filmRepository
+            ->getByUuids($currentExhibitions->pluck('film_id'))
+            ->groupBy('uuid');
 
-        // TODO considerar apenas is_active true na query de exibicoes diarias abaixo
-        $dailyRoomExhibitions = $this->exhibitionRepository->getDailyExhibitionsInRoom($day_of_week, $theater_room_id);
-        $dailyRoomFilms = $this->filmRepository->getByUuids($dailyRoomExhibitions->pluck('film_id'))->groupBy('uuid');
+        foreach ($currentExhibitions as $currentExhibition) {
+            $currentExhibitionFilm = $dailyRoomFilms[$currentExhibition->film_id]->first();
+            $this->detectConflictBetweenExhibitions($newExhibition, $currentExhibition, $currentExhibitionFilm);
+        }
+    }
 
-        foreach ($dailyRoomExhibitions as $dailyRoomExhibition) {
-            $film = $dailyRoomFilms[$dailyRoomExhibition->film_id]->first();
+    private function detectConflictBetweenExhibitions(
+        ExhibitionDTO $newExhibition,
+        ExhibitionDTO $currentExhibition,
+        FilmDTO $currentExhibitionFilm
+    ): void {
+        $exhibitionStartsAt = Carbon::parse($newExhibition->starts_at);
+        $exhibitionEndsAt = $exhibitionStartsAt->clone()->addMinutes($currentExhibitionFilm->duration);
 
-            $dailyRoomExhibitionStartsAt = Carbon::parse($dailyRoomExhibition->starts_at);
-            $dailyRoomExhibitionEndsAt = $dailyRoomExhibitionStartsAt->clone()->addMinutes($film->duration);
+        $dailyRoomExhibitionStartsAt = Carbon::parse($currentExhibition->starts_at);
+        $dailyRoomExhibitionEndsAt = $dailyRoomExhibitionStartsAt->clone()->addMinutes($currentExhibitionFilm->duration);
 
-            if (($dailyRoomExhibitionStartsAt < $exhibitionStartsAt) && ($dailyRoomExhibitionEndsAt > $exhibitionStartsAt)) {
-                throw new DomainException("A session is already supposed to take place at this time: $dailyRoomExhibitionStartsAt to $dailyRoomExhibitionEndsAt", 400);
-            }
-
-            if (($dailyRoomExhibitionStartsAt < $exhibitionEndsAt) && ($dailyRoomExhibitionEndsAt > $exhibitionEndsAt)) {
-                throw new DomainException("A session is already supposed to take place at this time: $dailyRoomExhibitionStartsAt to $dailyRoomExhibitionEndsAt", 400);
-            }
+        if (($dailyRoomExhibitionStartsAt < $exhibitionStartsAt) && ($dailyRoomExhibitionEndsAt > $exhibitionStartsAt)) {
+            throw new DomainException("A session is already supposed to take place at this time: $dailyRoomExhibitionStartsAt to $dailyRoomExhibitionEndsAt", 400);
         }
 
-        $exhibition = ExhibitionDTO::fromArray($data);
+        if (($dailyRoomExhibitionStartsAt < $exhibitionEndsAt) && ($dailyRoomExhibitionEndsAt > $exhibitionEndsAt)) {
+            throw new DomainException("A session is already supposed to take place at this time: $dailyRoomExhibitionStartsAt to $dailyRoomExhibitionEndsAt", 400);
+        }
 
-        $this->exhibitionRepository->create($exhibition);
-        return $exhibition;
+        if (($exhibitionStartsAt < $dailyRoomExhibitionStartsAt) && ($exhibitionEndsAt > $dailyRoomExhibitionEndsAt)) {
+            throw new DomainException("A session is already supposed to take place at this time: $dailyRoomExhibitionStartsAt to $dailyRoomExhibitionEndsAt", 400);
+        }
     }
 }
