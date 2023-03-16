@@ -10,7 +10,7 @@ class FilmFactory extends Factory
     {
         return [
             'uuid' => $this->faker->uuid,
-            'name' => $this->faker->name,
+            'name' => $this->faker->word,
             'year' => $this->faker->year,
             'duration' => $this->faker->numberBetween(90, 180)
         ];

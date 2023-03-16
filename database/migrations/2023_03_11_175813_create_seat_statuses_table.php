@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('theater_room_seats', function (Blueprint $table) {
+        Schema::create('seat_statuses', function (Blueprint $table) {
             $table->uuid()->primary();
             $table->string('name');
-            $table->foreignUuid('seat_type_id')->constrained('seat_types', 'uuid');
-            $table->foreignUuid('theater_room_row_id')->constrained('theater_room_rows', 'uuid');;
             $table->timestamps();
         });
     }
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('theater_room_seats');
+        Schema::dropIfExists('seat_statuses');
     }
 };

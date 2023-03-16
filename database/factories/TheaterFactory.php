@@ -11,7 +11,7 @@ class TheaterFactory extends Factory
     {
         return [
             'uuid' => $this->faker->uuid,
-            'name' => $this->faker->name,
+            'name' => $this->faker->word,
         ];
     }
 }

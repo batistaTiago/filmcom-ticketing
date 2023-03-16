@@ -11,7 +11,7 @@ class TheaterRoomRowFactory extends Factory
     {
         return [
             'uuid' => $this->faker->uuid,
-            'name' => $this->faker->name,
+            'name' => $this->faker->word,
             'theater_room_id' => TheaterRoom::factory(),
         ];
     }

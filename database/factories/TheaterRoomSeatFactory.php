@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\TheaterRoomRow;
-use App\Models\TheaterRoomSeatType;
+use App\Models\SeatType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TheaterRoomSeatFactory extends Factory
@@ -12,9 +12,9 @@ class TheaterRoomSeatFactory extends Factory
     {
         return [
             'uuid' => $this->faker->uuid,
-            'name' => $this->faker->name,
+            'name' => $this->faker->word,
             'theater_room_row_id' => TheaterRoomRow::factory(),
-            'theater_room_seat_type_id' => TheaterRoomSeatType::factory(),
+            'seat_type_id' => SeatType::factory(),
         ];
     }
 }

@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 class Exhibition extends Model
 {
     use HasFactory;
+
     public $primaryKey = 'uuid';
     public $incrementing = false;
     public $fillable = ExhibitionDTO::ATTRIBUTES;

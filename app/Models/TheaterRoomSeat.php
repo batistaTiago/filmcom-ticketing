@@ -18,12 +18,12 @@ class TheaterRoomSeat extends Model
         'uuid',
         'name',
         'theater_room_row_id',
-        'theater_room_seat_type_id'
+        'seat_type_id'
     ];
 
     public function type()
     {
-        return $this->hasOne(TheaterRoomSeatType::class, 'uuid', 'theater_room_seat_type_id');
+        return $this->hasOne(SeatType::class, 'uuid', 'seat_type_id');
     }
 
     public function toDTO(): TheaterRoomSeatDTO
