@@ -57,4 +57,5 @@ RUN composer install
 RUN php artisan octane:install --server=swoole
 
 RUN chmod -R 777 storage/
+
 EXPOSE 9000
