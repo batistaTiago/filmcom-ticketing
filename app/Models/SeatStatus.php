@@ -12,7 +12,8 @@ class SeatStatus extends Model
     public $primaryKey = 'uuid';
     public $incrementing = false;
 
-    public const REGULAR = 'regular';
-    public const LARGE = 'large';
-    public const WHEEL_CHAIR = 'wheel_chair';
+    public const AVAILABLE = 'available';
+    public const RESERVED = 'reserved';
+    public const SOLD = 'sold';
+    public const UNAVAILABLE = 'unavailable';
 }

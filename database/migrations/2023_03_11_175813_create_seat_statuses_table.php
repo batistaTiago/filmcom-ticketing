@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('seat_statuses', function (Blueprint $table) {
             $table->uuid()->primary();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->timestamps();
         });
     }

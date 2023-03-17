@@ -12,7 +12,7 @@ class TicketFactory extends Factory
     public function definition(): array
     {
         return [
-            'uuid' => $this->fake->uuid,
+            'uuid' => $this->faker->uuid,
             'exhibition_id' => Exhibition::factory(),
             'theater_room_seat_id' => TheaterRoomSeat::factory(),
             'ticket_type_id' => TicketType::factory(),

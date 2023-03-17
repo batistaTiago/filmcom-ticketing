@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('exhibition_seats', function (Blueprint $table) {
             $table->uuid()->primary();
-            $table->foreignUuid('seat_status_id')->constrained('seat_statuses', 'uuid');
             $table->foreignUuid('exhibition_id')->constrained('exhibitions', 'uuid');
+            $table->foreignUuid('theater_room_seat_id')->constrained('theater_room_seats', 'uuid');
+            $table->foreignUuid('seat_status_id')->constrained('seat_statuses', 'uuid');
             $table->timestamps();
         });
     }

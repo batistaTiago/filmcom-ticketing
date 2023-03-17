@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Exhibition;
 use App\Models\Film;
+use App\Models\SeatType;
 use App\Models\Theater;
 use App\Models\TheaterRoom;
 use App\Models\TheaterRoomRow;
@@ -29,6 +30,8 @@ class ListFilmExhibitionsTest extends TestCase
         $this->theater = Theater::factory()->create();
         $this->rooms = TheaterRoom::factory()->times(2)->create(['theater_id' => $this->theater->uuid])->toArray();
 
+        $seatType = SeatType::factory()->create();
+
         foreach ($this->rooms as $room) {
             $this->rows[$room['uuid']] = TheaterRoomRow::factory()->times(3)->create([
                 'theater_room_id' => $room['uuid']
@@ -36,7 +39,8 @@ class ListFilmExhibitionsTest extends TestCase
 
             foreach ($this->rows[$room['uuid']] as $row) {
                 $this->seats[$room['uuid']][$row['uuid']] = TheaterRoomSeat::factory()->times(4)->create([
-                    'theater_room_row_id' => $row['uuid']
+                    'theater_room_row_id' => $row['uuid'],
+                    'seat_type_id' => $seatType->uuid
                 ])->toArray();
             }
         }

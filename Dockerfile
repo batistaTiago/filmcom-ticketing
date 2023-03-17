@@ -35,20 +35,20 @@ RUN docker-php-ext-install exif pcntl zip mysqli pdo_mysql \
 RUN apt clean && rm -rf /var/lib/apt/lists/*
 
 # INSTALLING PHP EXTENSIONS WITH PECL CMD
-RUN pecl install -o -f openswoole-22.0.0 \
+RUN pecl install -o -f redis-5.3.7 openswoole-22.0.0 rdkafka-6.0.2 mongodb-1.14.0 \
     &&  rm -rf /tmp/pear \
-    &&  docker-php-ext-enable openswoole
+    &&  docker-php-ext-enable redis openswoole rdkafka mongodb
 
 # INSTALLING COMPOSER
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN groupadd --force -g $WWWGROUP sail
+#RUN groupadd --force -g $WWWGROUP sail
 
-RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
+#RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
 
-# COPY ./php.ini /usr/local/etc/php/conf.d/99-sail.ini
+## COPY ./php.ini /usr/local/etc/php/conf.d/99-sail.ini
 
-COPY src ./
+COPY . .
 
 RUN composer install
 

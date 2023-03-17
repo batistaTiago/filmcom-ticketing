@@ -24,9 +24,10 @@ class DatabaseSeeder extends Seeder
         TicketType::factory()->create(['name' => TicketType::STUDENT]);
         TicketType::factory()->create(['name' => TicketType::COURTESY]);
 
-        SeatStatus::factory()->create(['name' => SeatStatus::REGULAR]);
-        SeatStatus::factory()->create(['name' => SeatStatus::LARGE]);
-        SeatStatus::factory()->create(['name' => SeatStatus::WHEEL_CHAIR]);
+        SeatStatus::factory()->create(['name' => SeatStatus::AVAILABLE]);
+        SeatStatus::factory()->create(['name' => SeatStatus::RESERVED]);
+        SeatStatus::factory()->create(['name' => SeatStatus::SOLD]);
+        SeatStatus::factory()->create(['name' => SeatStatus::UNAVAILABLE]);
 
         Film::factory()->times(15)->create();
         $theaters = Theater::factory()->times(3)->create();

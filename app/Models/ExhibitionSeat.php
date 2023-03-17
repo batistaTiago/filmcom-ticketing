@@ -11,4 +11,10 @@ class ExhibitionSeat extends Model
 
     public $primaryKey = 'uuid';
     public $incrementing = false;
+    public $fillable = [
+        'uuid',
+        'exhibition_id',
+        'theater_room_seat_id',
+        'seat_status_id',
+    ];
 }

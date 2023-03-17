@@ -2,26 +2,69 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\CreateExhibitionSeatAvailabilityJob;
 use App\Models\Exhibition;
 use App\Models\Film;
+use App\Models\SeatStatus;
+use App\Models\SeatType;
 use App\Models\TheaterRoom;
+use App\Models\TheaterRoomRow;
+use App\Models\TheaterRoomSeat;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Facades\Bus;
 use Tests\TestCase;
 
 class CreateExhibitionTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+        SeatStatus::factory()->create(['name' => SeatStatus::AVAILABLE]);
+    }
+
     /**
      * @test
      * @dataProvider validExhibitionData
      */
     public function should_be_able_to_create_an_exhibition_of_a_film_in_a_theater_room($sampleData)
     {
+        Bus::fake();
+
         Film::factory()->create(['uuid' => $sampleData['film_id']]);
         TheaterRoom::factory()->create(['uuid' => $sampleData['theater_room_id']]);
 
         $this->postJson(route('api.exhibitions.create'), $sampleData)->assertCreated();
         $this->assertDatabaseHas('exhibitions', $sampleData);
+
+        Bus::assertDispatchedTimes(CreateExhibitionSeatAvailabilityJob::class, 1);
+    }
+
+    /**
+     * @test
+     * @dataProvider validExhibitionData
+     */
+    public function should_populate_the_seat_statuses_for_a_newly_created_exhibition($sampleData)
+    {
+        Film::factory()->create(['uuid' => $sampleData['film_id']]);
+        $room = TheaterRoom::factory()->create(['uuid' => $sampleData['theater_room_id']]);
+
+        $rows = TheaterRoomRow::factory()->times(3)->create([
+            'theater_room_id' => $room->uuid
+        ]);
+
+        $seatType = SeatType::factory()->create();
+
+        foreach ($rows as $row) {
+            TheaterRoomSeat::factory()->times(4)->create([
+                'theater_room_row_id' => $row->uuid,
+                'seat_type_id' => $seatType->uuid
+            ]);
+        }
+
+        $this->postJson(route('api.exhibitions.create'), $sampleData)->assertCreated();
+
+        $this->assertDatabaseCount('exhibition_seats', 12);
     }
 
     /**
@@ -146,9 +189,11 @@ class CreateExhibitionTest extends TestCase
             [120, '07:00', true, 201],
             [120, '12:30', true, 201],
             [120, '21:30', true, 201],
+
             [30, '09:59', true, 400],
             [180, '14:59', true, 400],
             [600, '14:30', true, 400],
+            [30, '19:00', true, 400],
 
             [30, '09:59', false, 201],
             [180, '14:59', false, 201],

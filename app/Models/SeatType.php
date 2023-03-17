@@ -11,5 +11,7 @@ class SeatType extends Model
 
     public $primaryKey = 'uuid';
     public $incrementing = false;
-
+    public const REGULAR = 'regular';
+    public const LARGE = 'large';
+    public const WHEEL_CHAIR = 'wheel_chair';
 }

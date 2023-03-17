@@ -6,32 +6,56 @@ networks:
 volumes:
     mysql_data:
         driver: local
+    redis_data:
+        driver: local
 
 services:
     mysql:
         image: mysql:5.7.22
         restart: unless-stopped
-        networks: 
+        networks:
             - filmcom-ticketing-network
         tty: true
         ports:
             - "3306:3306"
         volumes:
             - mysql_data:/var/lib/mysql
-        environment: 
+        environment:
             MYSQL_DATABASE: filmcom-ticketing
             MYSQL_USER: root
             MYSQL_PASSWORD: root
             MYSQL_ROOT_PASSWORD: root
 
-    php:
+    redis:
+        image: redis
+        networks:
+            - filmcom-ticketing-network
+        restart: always
+        ports:
+            - 6380:6379
+        volumes:
+            - redis_data:/data
+
+    api:
         build: .
         networks:
             - filmcom-ticketing-network
         volumes:
-            - ./src:/var/www/html
-        depends_on: 
+            - ./:/var/www/html
+        depends_on:
             - mysql
+            - redis
         command: php artisan serve --host=0.0.0.0 --port=9000
         ports:
             - "9098:9000"
+
+    worker:
+        build: .
+        networks:
+            - filmcom-ticketing-network
+        volumes:
+            - ./:/var/www/html
+        depends_on:
+            - mysql
+            - redis
+        command: php artisan horizon

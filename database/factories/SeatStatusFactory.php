@@ -9,7 +9,7 @@ class SeatStatusFactory extends Factory
     public function definition(): array
     {
         return [
-            'uuid' => $this->fake->uuid,
+            'uuid' => $this->faker->uuid,
             'name' => $this->faker->word,
         ];
     }

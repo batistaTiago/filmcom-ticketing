@@ -11,7 +11,7 @@ class ExhibitionSeatFactory extends Factory
     public function definition(): array
     {
         return [
-            'uuid' => $this->fake->uuid,
+            'uuid' => $this->faker->uuid,
             'exhibition_id' => Exhibition::factory(),
             'seat_status_id' => SeatStatus::factory(),
         ];

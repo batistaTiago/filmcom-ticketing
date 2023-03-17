@@ -6,6 +6,7 @@ use App\Domain\DTO\ExhibitionDTO;
 use App\Domain\DTO\FilmDTO;
 use App\Domain\Repositories\ExhibitionRepositoryInterface;
 use App\Domain\Repositories\FilmRepositoryInterface;
+use App\Jobs\CreateExhibitionSeatAvailabilityJob;
 use Carbon\Carbon;
 use DomainException;
 
@@ -22,6 +23,10 @@ class CreateExhibitionUseCase
         $newExhibition = ExhibitionDTO::fromArray($data);
         $this->validateRoomAvailability($newExhibition);
         $this->exhibitionRepository->create($newExhibition);
+
+        // TODO move to a job dispatcher interface
+        CreateExhibitionSeatAvailabilityJob::dispatch($newExhibition);
+
         return $newExhibition;
     }
 
@@ -51,15 +56,15 @@ class CreateExhibitionUseCase
         $dailyRoomExhibitionStartsAt = Carbon::parse($currentExhibition->starts_at);
         $dailyRoomExhibitionEndsAt = $dailyRoomExhibitionStartsAt->clone()->addMinutes($currentExhibitionFilm->duration);
 
-        if (($dailyRoomExhibitionStartsAt < $exhibitionStartsAt) && ($dailyRoomExhibitionEndsAt > $exhibitionStartsAt)) {
+        if (($dailyRoomExhibitionStartsAt <= $exhibitionStartsAt) && ($dailyRoomExhibitionEndsAt >= $exhibitionStartsAt)) {
             throw new DomainException("A session is already supposed to take place at this time: $dailyRoomExhibitionStartsAt to $dailyRoomExhibitionEndsAt", 400);
         }
 
-        if (($dailyRoomExhibitionStartsAt < $exhibitionEndsAt) && ($dailyRoomExhibitionEndsAt > $exhibitionEndsAt)) {
+        if (($dailyRoomExhibitionStartsAt <= $exhibitionEndsAt) && ($dailyRoomExhibitionEndsAt >= $exhibitionEndsAt)) {
             throw new DomainException("A session is already supposed to take place at this time: $dailyRoomExhibitionStartsAt to $dailyRoomExhibitionEndsAt", 400);
         }
 
-        if (($exhibitionStartsAt < $dailyRoomExhibitionStartsAt) && ($exhibitionEndsAt > $dailyRoomExhibitionEndsAt)) {
+        if (($exhibitionStartsAt <= $dailyRoomExhibitionStartsAt) && ($exhibitionEndsAt >= $dailyRoomExhibitionEndsAt)) {
             throw new DomainException("A session is already supposed to take place at this time: $dailyRoomExhibitionStartsAt to $dailyRoomExhibitionEndsAt", 400);
         }
     }
