@@ -1,5 +1,6 @@
-# Installing PHP libraries
+## Useful commands
 
+### Installing PHP libraries
 ```
 docker run --rm \
     -u "$(id -u):$(id -g)" \
@@ -7,4 +8,9 @@ docker run --rm \
     -w /var/www/html \
     laravelsail/php82-composer:latest \
     composer install --ignore-platform-reqs
+```
+
+### Running tests outside of the container
+```
+DB_HOST=localhost REDIS_HOST=localhost vendor/bin/phpunit
 ```

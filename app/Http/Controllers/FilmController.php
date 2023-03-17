@@ -18,7 +18,7 @@ class FilmController extends Controller
 
     public function store(CreateFilmRequest $request, CreateFilmUseCase $useCase)
     {
-        $data = array_merge($request->all(), ['uuid' => Str::orderedUuid()->toString()]);
+        $data = array_merge($request->validated(), ['uuid' => Str::orderedUuid()->toString()]);
         return response()->json($useCase->execute($data), 201);
     }
 }

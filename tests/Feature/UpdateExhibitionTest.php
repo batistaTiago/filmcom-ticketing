@@ -2,12 +2,23 @@
 
 namespace Tests\Feature;
 
+use App\Models\Exhibition;
 use Tests\TestCase;
 
 class UpdateExhibitionTest extends TestCase
 {
-    public function test_example(): void
+    /** @test */
+    public function should_update_an_exhibition(): void
     {
-        $this->markTestIncomplete('TBD');
+        $exhibition = Exhibition::factory()->create(['starts_at' => '11:00']);
+//        dd(route('api.exhibitions.update', $exhibition->uuid));
+
+        $patchedData = array_merge($exhibition->toArray(), ['starts_at' => '10:00']);
+
+        $this->patch(route('api.exhibitions.update', $exhibition->uuid), $patchedData)
+            ->assertOk()
+            ->decodeResponseJson();
+
+        $this->assertDatabaseHas('exhibitions', $patchedData);
     }
 }

@@ -42,6 +42,7 @@ Route::prefix('theaters')->group(function () {
 
 Route::prefix('exhibitions')->group(function () {
     Route::post('/create', [ExhibitionController::class, 'store'])->name('api.exhibitions.create');
+    Route::patch('/{exhibition_id}', [ExhibitionController::class, 'update'])->name('api.exhibitions.update');
 });
 
 Route::prefix('ticket-types')->group(function () {

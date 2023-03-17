@@ -15,7 +15,7 @@ class TheaterController extends Controller
 
     public function store(CreateTheaterRequest $request)
     {
-        $data = array_merge($request->all(), ['uuid' => Str::orderedUuid()->toString()]);
+        $data = array_merge($request->validated(), ['uuid' => Str::orderedUuid()->toString()]);
         return response()->json($this->useCase->execute($data));
     }
 }

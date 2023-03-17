@@ -2,12 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Traits\FailedValidationJsonResponse;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
 class CreateTheaterRequest extends FormRequest
 {
+    use FailedValidationJsonResponse;
+
     public function authorize(): bool
     {
         return true;
@@ -18,17 +19,5 @@ class CreateTheaterRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'min:3', 'max:255'],
         ];
-    }
-
-    protected function failedValidation(Validator $validator)
-    {
-        $errors = $validator->errors();
-
-        $response = response()->json([
-            'message' => 'The submitted data is invalid',
-            'errors' => $errors->messages(),
-        ], 400);
-
-        throw new HttpResponseException($response);
     }
 }
