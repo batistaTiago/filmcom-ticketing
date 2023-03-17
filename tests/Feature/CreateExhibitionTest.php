@@ -20,7 +20,7 @@ class CreateExhibitionTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        SeatStatus::factory()->create(['name' => SeatStatus::AVAILABLE]);
+        SeatStatus::factory()->create(['name' => SeatStatus::DEFAULT]);
     }
 
     /**
@@ -62,9 +62,11 @@ class CreateExhibitionTest extends TestCase
             ]);
         }
 
+        $this->assertDatabaseCount('theater_room_seats', 12);
+
         $this->postJson(route('api.exhibitions.create'), $sampleData)->assertCreated();
 
-        $this->assertDatabaseCount('exhibition_seats', 12);
+        $this->assertDatabaseCount('exhibition_seats', TheaterRoomSeat::query()->count());
     }
 
     /**
@@ -144,7 +146,63 @@ class CreateExhibitionTest extends TestCase
                     'theater_room_id' => fake()->uuid,
                     'starts_at' => fake()->time,
                     'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
-                    'is_active' => false,
+                    'is_active' => true,
+                ],
+            ],
+
+            [
+                [
+                    'film_id' => fake()->uuid,
+                    'theater_room_id' => fake()->uuid,
+                    'starts_at' => '16:45',
+                    'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
+                    'is_active' => true,
+                ],
+            ],
+            [
+                [
+                    'film_id' => fake()->uuid,
+                    'theater_room_id' => fake()->uuid,
+                    'starts_at' => '17:00',
+                    'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
+                    'is_active' => true,
+                ],
+            ],
+            [
+                [
+                    'film_id' => fake()->uuid,
+                    'theater_room_id' => fake()->uuid,
+                    'starts_at' => '10:20',
+                    'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
+                    'is_active' => true,
+                ],
+            ],
+
+            [
+                [
+                    'film_id' => fake()->uuid,
+                    'theater_room_id' => fake()->uuid,
+                    'starts_at' => fake()->time,
+                    'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
+                    'is_active' => true,
+                ],
+            ],
+            [
+                [
+                    'film_id' => fake()->uuid,
+                    'theater_room_id' => fake()->uuid,
+                    'starts_at' => fake()->time,
+                    'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
+                    'is_active' => true,
+                ],
+            ],
+            [
+                [
+                    'film_id' => fake()->uuid,
+                    'theater_room_id' => fake()->uuid,
+                    'starts_at' => fake()->time,
+                    'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
+                    'is_active' => true,
                 ],
             ],
         ];

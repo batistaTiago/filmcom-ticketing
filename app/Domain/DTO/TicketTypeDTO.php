@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Domain\DTO\TheaterRoom;
+namespace App\Domain\DTO;
 
 use InvalidArgumentException;
 
-class TheaterRoomSeatTypeDTO
+class TicketTypeDTO
 {
     public function __construct(public string $name)
     {

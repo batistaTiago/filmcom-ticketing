@@ -3,13 +3,14 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class SeatStatusFactory extends Factory
 {
     public function definition(): array
     {
         return [
-            'uuid' => $this->faker->uuid,
+            'uuid' => Str::orderedUuid()->toString(),
             'name' => $this->faker->word,
         ];
     }

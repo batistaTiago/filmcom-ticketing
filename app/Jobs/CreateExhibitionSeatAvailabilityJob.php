@@ -6,6 +6,7 @@ use App\Domain\DTO\ExhibitionDTO;
 use App\Models\ExhibitionSeat;
 use App\Models\SeatStatus;
 use App\Models\TheaterRoomRow;
+use App\Models\TheaterRoomSeat;
 use Error;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -32,7 +33,7 @@ class CreateExhibitionSeatAvailabilityJob implements ShouldQueue
             // TODO layerize this code
             DB::beginTransaction();
             $rows = TheaterRoomRow::with('seats')->where('theater_room_id', $this->exhibition->theater_room_id)->get();
-            $defaultSeatStatus = SeatStatus::where(['name' => SeatStatus::AVAILABLE])->first();
+            $defaultSeatStatus = SeatStatus::where(['name' => SeatStatus::DEFAULT])->first();
 
             if (empty($defaultSeatStatus)) {
                 throw new Error('The default seat status has not been setup.');

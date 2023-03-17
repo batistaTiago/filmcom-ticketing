@@ -4,7 +4,7 @@ namespace App\Domain\DTO\TheaterRoom;
 
 use InvalidArgumentException;
 
-class TheaterRoomSeatTypeDTO
+class TheaterRoomSeatStatusDTO
 {
     public function __construct(public string $name)
     {

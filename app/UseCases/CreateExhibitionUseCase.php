@@ -27,6 +27,8 @@ class CreateExhibitionUseCase
         // TODO move to a job dispatcher interface
         CreateExhibitionSeatAvailabilityJob::dispatch($newExhibition);
 
+
+
         return $newExhibition;
     }
 

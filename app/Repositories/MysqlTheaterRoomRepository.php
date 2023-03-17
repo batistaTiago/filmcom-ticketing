@@ -9,7 +9,6 @@ use App\Models\TheaterRoom;
 
 class MysqlTheaterRoomRepository implements TheaterRoomRepositoryInterface
 {
-
     // TODO: segundo parametro (ou decorator) para customizar o throw do error retornando null
     public function findRoomById(string $uuid): TheaterRoomDTO
     {
@@ -17,6 +16,25 @@ class MysqlTheaterRoomRepository implements TheaterRoomRepositoryInterface
 
         if (!$entry) {
             throw new ResourceNotFoundException("Theater room was not found: $uuid", 404);
+        }
+
+        return $entry->toDTO();
+    }
+
+    public function findRoomAvailability(string $theaterRoomUuid, string $exhibitionUuid): mixed
+    {
+        $entry = TheaterRoom::query()
+            ->with('rows.seats.type')
+            ->with([
+                'rows.seats.exhibition_seats' => function ($builder) use ($exhibitionUuid) {
+                    $builder->with('seat_status')->where('exhibition_id', $exhibitionUuid);
+                }
+            ])
+            ->where(['uuid' => $theaterRoomUuid])
+            ->first();
+
+        if (!$entry) {
+            throw new ResourceNotFoundException("Theater room was not found: $theaterRoomUuid", 404);
         }
 
         return $entry->toDTO();

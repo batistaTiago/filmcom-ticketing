@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Exhibition;
+use App\Models\ExhibitionSeat;
+use App\Models\SeatStatus;
 use App\Models\SeatType;
 use App\Models\TheaterRoom;
 use App\Models\TheaterRoomRow;
@@ -26,18 +29,18 @@ class ShowTheaterRoomTest extends TestCase
         $seatType = SeatType::factory()->create();
 
         $room = TheaterRoom::factory()->create();
-        $rows = TheaterRoomRow::factory()->times(rand(2, 3))->create([
+        $rows = TheaterRoomRow::factory()->times(2)->create([
             'theater_room_id' => $room->uuid
         ]);
 
         foreach ($rows as $row) {
-            TheaterRoomSeat::factory()->times(rand(3, 4))->create([
+            TheaterRoomSeat::factory()->times(3)->create([
                 'theater_room_row_id' => $row->uuid,
                 'seat_type_id' => $seatType->uuid
             ]);
         }
 
-        $this->get(route('api.theater-rooms.show', $room->uuid))
+        $res = $this->get(route('api.theater-rooms.show', $room->uuid))
             ->assertOk()
             ->assertJsonStructure([
                 'uuid',
@@ -55,6 +58,78 @@ class ShowTheaterRoomTest extends TestCase
                         ]
                     ]
                 ]
+            ])
+            ->decodeResponseJson();
+
+        foreach ($res['rows'] as $row) {
+            foreach ($row['seats'] as $seat) {
+                $this->assertNotNull($seat['type']['name']);
+                $this->assertNull($seat['status']);
+            }
+        }
+    }
+
+    /** @test */
+    public function should_return_the_room_map_along_with_the_seat_statuses_for_a_specific_exhibition()
+    {
+        $seatType = SeatType::factory()->create();
+        $defaultSeatStatus = SeatStatus::factory()->create(['name' => SeatStatus::DEFAULT]);
+
+        $room = TheaterRoom::factory()->create();
+        $rows = TheaterRoomRow::factory()->times(2)->create([
+            'theater_room_id' => $room->uuid
+        ]);
+
+        $exhibitions = Exhibition::factory()->times(2)->create([
+            'theater_room_id' => $room->uuid,
+        ]);
+
+        foreach ($rows as $row) {
+            $seats = TheaterRoomSeat::factory()->times(3)->create([
+                'theater_room_row_id' => $row->uuid,
+                'seat_type_id' => $seatType->uuid
             ]);
+
+            foreach ($exhibitions as $exhibition) {
+                foreach ($seats as $seat) {
+                    ExhibitionSeat::factory()->create([
+                        'exhibition_id' => $exhibition->uuid,
+                        'theater_room_seat_id' => $seat->uuid,
+                        'seat_status_id' => $defaultSeatStatus->uuid,
+                    ]);
+                }
+            }
+        }
+
+        $res = $this->get(route('api.theater-rooms.show-availability', [$room->uuid, $exhibitions->first()->uuid]))
+            ->assertOk()
+            ->assertJsonStructure([
+                'uuid',
+                'name',
+                'rows' => [
+                    [
+                        'name',
+                        'seats' => [
+                            [
+                                'name',
+                                'type' => [
+                                    'name'
+                                ],
+                                'status' => [
+                                    'name'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ])
+            ->decodeResponseJson();
+
+        foreach ($res['rows'] as $row) {
+            foreach ($row['seats'] as $seat) {
+                $this->assertNotNull($seat['type']['name']);
+                $this->assertNotNull($seat['status']['name']);
+            }
+        }
     }
 }

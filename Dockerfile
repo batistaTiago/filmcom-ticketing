@@ -39,6 +39,8 @@ RUN pecl install -o -f redis-5.3.7 openswoole-22.0.0 rdkafka-6.0.2 mongodb-1.14.
     &&  rm -rf /tmp/pear \
     &&  docker-php-ext-enable redis openswoole rdkafka mongodb
 
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+
 # INSTALLING COMPOSER
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
@@ -54,4 +56,5 @@ RUN composer install
 
 RUN php artisan octane:install --server=swoole
 
+RUN chmod -R 777 storage/
 EXPOSE 9000

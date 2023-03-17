@@ -9,11 +9,13 @@ class TheaterRoomSeatDTO
     public readonly string $uuid;
     public string $name;
     public TheaterRoomSeatTypeDTO $type;
+    public ?TheaterRoomSeatStatusDTO $status;
 
     public function __construct(
         string $uuid,
         string $name,
         TheaterRoomSeatTypeDTO $type,
+        ?TheaterRoomSeatStatusDTO $status = null,
     ) {
         if (empty($name)) {
             throw new InvalidArgumentException('Name should not be empty');
@@ -26,5 +28,6 @@ class TheaterRoomSeatDTO
         $this->uuid = $uuid;
         $this->name = $name;
         $this->type = $type;
+        $this->status = $status;
     }
 }

@@ -2,18 +2,19 @@
 
 namespace Database\Factories;
 
+use App\Models\Exhibition;
+use App\Models\TicketType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-class FilmFactory extends Factory
+class ExhibitionTicketTypeFactory extends Factory
 {
     public function definition(): array
     {
         return [
             'uuid' => Str::orderedUuid()->toString(),
-            'name' => $this->faker->word,
-            'year' => $this->faker->year,
-            'duration' => $this->faker->numberBetween(90, 180)
+            'exhibition_id' => Exhibition::factory(),
+            'ticket_type_id' => TicketType::factory(),
         ];
     }
 }

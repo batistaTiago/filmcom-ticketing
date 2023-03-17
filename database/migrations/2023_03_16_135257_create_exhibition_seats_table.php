@@ -16,6 +16,10 @@ return new class extends Migration
             $table->foreignUuid('exhibition_id')->constrained('exhibitions', 'uuid');
             $table->foreignUuid('theater_room_seat_id')->constrained('theater_room_seats', 'uuid');
             $table->foreignUuid('seat_status_id')->constrained('seat_statuses', 'uuid');
+
+            $table->unique(['exhibition_id', 'theater_room_seat_id']);
+
+
             $table->timestamps();
         });
     }

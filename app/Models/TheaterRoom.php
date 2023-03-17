@@ -43,7 +43,7 @@ class TheaterRoom extends Model
 
     private function convertRowsToDTO(Collection $rows)
     {
-        return $rows->map(function ($row) {
+        return $rows->map(function (TheaterRoomRow $row) {
             return $row->toDTO();
         })->toArray();
     }

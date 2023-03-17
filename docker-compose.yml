@@ -59,3 +59,4 @@ services:
             - mysql
             - redis
         command: php artisan horizon
+

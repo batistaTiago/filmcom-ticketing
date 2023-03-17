@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateExhibitionRequest;
 use App\UseCases\CreateExhibitionUseCase;
+use App\UseCases\ListExhibitionTicketTypesUseCase;
 use App\UseCases\ListFilmExhibitionsUseCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -19,6 +20,11 @@ class ExhibitionController
     {
         $data = array_merge($request->all(), ['uuid' => Str::orderedUuid()->toString()]);
         return response()->json($useCase->execute($data), 201);
+    }
+
+    public function getTicketTypes(Request $request, ListExhibitionTicketTypesUseCase $useCase)
+    {
+        return response()->json($useCase->execute($request->exhibition_id));
     }
 
 }
