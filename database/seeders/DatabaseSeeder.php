@@ -12,6 +12,7 @@ use App\Models\TheaterRoomSeat;
 use App\Models\SeatType;
 use App\Models\TicketType;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,36 +21,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        TicketType::factory()->create(['name' => TicketType::REGULAR]);
-        TicketType::factory()->create(['name' => TicketType::STUDENT]);
-        TicketType::factory()->create(['name' => TicketType::COURTESY]);
+        $this->call(BasicRequiredDataSeeder::class);
 
-        SeatStatus::factory()->create(['name' => SeatStatus::AVAILABLE]);
-        SeatStatus::factory()->create(['name' => SeatStatus::RESERVED]);
-        SeatStatus::factory()->create(['name' => SeatStatus::SOLD]);
-        SeatStatus::factory()->create(['name' => SeatStatus::UNAVAILABLE]);
-
-        Film::factory()->times(15)->create();
-        $theaters = Theater::factory()->times(3)->create();
-        $seatTypes = SeatType::factory()->times(3)->create();
-
-        foreach ($theaters as $theater) {
-            $rooms = TheaterRoom::factory()->times(3)->create(['theater_id' => $theater->uuid]);
-
-            foreach ($rooms as $room) {
-                $rows = TheaterRoomRow::factory()->times(rand(2, 3))->create([
-                    'theater_room_id' => $room->uuid
-                ]);
-
-                foreach ($rows as $row) {
-                    $seatType = $seatTypes[fake()->numberBetween(0, count($seatTypes) - 1)];
-
-                    TheaterRoomSeat::factory()->times(rand(3, 4))->create([
-                        'theater_room_row_id' => $row->uuid,
-                        'seat_type_id' => $seatType
-                    ]);
-                }
-            }
+        if (config('app.env') === 'production') {
+            return;
         }
+
+        $this->call(SeederFakeDataForTesting::class);
     }
 }

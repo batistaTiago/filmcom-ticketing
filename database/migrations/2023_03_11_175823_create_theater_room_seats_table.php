@@ -15,7 +15,9 @@ return new class extends Migration
             $table->uuid()->primary();
             $table->string('name');
             $table->foreignUuid('seat_type_id')->constrained('seat_types', 'uuid');
-            $table->foreignUuid('theater_room_row_id')->constrained('theater_room_rows', 'uuid');;
+            $table->foreignUuid('theater_room_row_id')->constrained('theater_room_rows', 'uuid');
+
+            $table->unique(['name', 'theater_room_row_id']);
             $table->timestamps();
         });
     }

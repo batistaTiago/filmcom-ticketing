@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('theater_room_rows', function (Blueprint $table) {
             $table->uuid()->primary();
             $table->string('name');
-            $table->foreignUuid('theater_room_id')->constrained('theater_rooms', 'uuid');;
+            $table->foreignUuid('theater_room_id')->constrained('theater_rooms', 'uuid');
+
+            $table->unique(['name', 'theater_room_id']);
             $table->timestamps();
         });
     }

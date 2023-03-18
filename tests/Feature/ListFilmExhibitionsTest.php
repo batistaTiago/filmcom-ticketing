@@ -14,51 +14,41 @@ use Tests\TestCase;
 
 class ListFilmExhibitionsTest extends TestCase
 {
-    private Film $film;
-    private Theater $theater;
-    private array $rooms;
-    private array $rows;
-    private array $seats;
-
     private const EXPECTED_EXHIBITION_COUNT = 10;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->film = Film::factory()->create();
-        $this->theater = Theater::factory()->create();
-        $this->rooms = TheaterRoom::factory()->times(2)->create(['theater_id' => $this->theater->uuid])->toArray();
-
-        $seatType = SeatType::factory()->create();
-
-        foreach ($this->rooms as $room) {
-            $this->rows[$room['uuid']] = TheaterRoomRow::factory()->times(3)->create([
-                'theater_room_id' => $room['uuid']
-            ])->toArray();
-
-            foreach ($this->rows[$room['uuid']] as $row) {
-                $this->seats[$room['uuid']][$row['uuid']] = TheaterRoomSeat::factory()->times(4)->create([
-                    'theater_room_row_id' => $row['uuid'],
-                    'seat_type_id' => $seatType->uuid
-                ])->toArray();
-            }
-        }
-
-        Exhibition::factory()->times(10)->create([
-            'film_id' => $this->film->uuid,
-            'theater_room_id' => Arr::random($this->rooms)['uuid']
-        ]);
-
-        Exhibition::factory()->times(10)->create([
-            'theater_room_id' => Arr::random($this->rooms)['uuid']
-        ]);
-    }
 
     /** @test */
     public function should_list_all_the_exhibitions_for_a_film()
     {
-        $url = route('api.film_exhibitions.index') . '?' . http_build_query(['film_id' => $this->film->uuid]);
+
+        $film = Film::factory()->create();
+        $theater = Theater::factory()->create();
+        $rooms = TheaterRoom::factory()->times(2)->create(['theater_id' => $theater->uuid]);
+
+        $seatType = SeatType::factory()->create();
+
+        foreach ($rooms as $room) {
+            $rows[$room->uuid] = TheaterRoomRow::factory()->times(3)->create([
+                'theater_room_id' => $room->uuid
+            ]);
+
+            foreach ($rows[$room->uuid] as $row) {
+                TheaterRoomSeat::factory()->times(4)->create([
+                    'theater_room_row_id' => $row->uuid,
+                    'seat_type_id' => $seatType->uuid
+                ]);
+            }
+        }
+
+        Exhibition::factory()->times(10)->create([
+            'film_id' => $film->uuid,
+            'theater_room_id' => $rooms->random()->uuid
+        ]);
+
+        Exhibition::factory()->times(10)->create([
+            'theater_room_id' => $rooms->random()->uuid
+        ]);
+
+        $url = route('api.film_exhibitions.index') . '?' . http_build_query(['film_id' => $film->uuid]);
         $res = $this->get($url)
             ->assertOk()
             ->assertJsonStructure([
@@ -73,6 +63,6 @@ class ListFilmExhibitionsTest extends TestCase
             ])
             ->decodeResponseJson();
 
-        $this->assertCount(10, $res);
+        $this->assertCount(self::EXPECTED_EXHIBITION_COUNT, $res);
     }
 }

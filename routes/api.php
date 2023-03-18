@@ -7,16 +7,6 @@ use App\Http\Controllers\TheaterController;
 use App\Http\Controllers\TicketTypeController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
 
 Route::prefix('films')->group(function () {
     Route::get('/', [FilmController::class, 'index'])->name('api.films.index');
@@ -37,6 +27,7 @@ Route::prefix('theaters')->group(function () {
     Route::prefix('rooms')->group(function () {
         Route::get('/{room_id}', [TheaterRoomController::class, 'show'])->name('api.theater-rooms.show');
         Route::get('/{room_id}/{exhibition_id}', [TheaterRoomController::class, 'showAvailability'])->name('api.theater-rooms.show-availability');
+        Route::post('import-seat-map', [TheaterRoomController::class, 'importSeatMapSpreadsheet'])->name('api.theater-room-seat-map.import');
     });
 });
 

@@ -13,6 +13,7 @@ use App\Models\TheaterRoomSeat;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class CreateExhibitionTest extends TestCase
@@ -49,20 +50,27 @@ class CreateExhibitionTest extends TestCase
         Film::factory()->create(['uuid' => $sampleData['film_id']]);
         $room = TheaterRoom::factory()->create(['uuid' => $sampleData['theater_room_id']]);
 
-        $rows = TheaterRoomRow::factory()->times(3)->create([
-            'theater_room_id' => $room->uuid
-        ]);
-
+        $rowCount = rand(2, 3);
+        $seatCount = rand(3, 4);
         $seatType = SeatType::factory()->create();
 
-        foreach ($rows as $row) {
-            TheaterRoomSeat::factory()->times(4)->create([
-                'theater_room_row_id' => $row->uuid,
-                'seat_type_id' => $seatType->uuid
+        for ($i = 0; $i < $rowCount; $i++) {
+            $row = TheaterRoomRow::factory()->create([
+                'name' => Str::orderedUuid()->toString(),
+                'theater_room_id' => $room->uuid
             ]);
+
+            for ($j = 0; $j < $seatCount; $j++) {
+
+                TheaterRoomSeat::factory()->create([
+                    'name' => Str::orderedUuid()->toString(),
+                    'theater_room_row_id' => $row->uuid,
+                    'seat_type_id' => $seatType->uuid
+                ]);
+            }
         }
 
-        $this->assertDatabaseCount('theater_room_seats', 12);
+        $this->assertDatabaseCount('theater_room_seats', $seatCount * $rowCount);
 
         $this->postJson(route('api.exhibitions.create'), $sampleData)->assertCreated();
 

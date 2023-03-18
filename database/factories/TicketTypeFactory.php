@@ -11,7 +11,7 @@ class TicketTypeFactory extends Factory
     {
         return [
             'uuid' => Str::orderedUuid()->toString(),
-            'name' => $this->faker->word,
+            'name' => strtolower(Str::random(24)),
         ];
     }
 }
