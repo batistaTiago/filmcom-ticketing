@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Domain\DTO\ExhibitionDTO;
 use App\Domain\DTO\FilmDTO;
 use App\Domain\Repositories\ExhibitionRepositoryInterface;
+use App\Exceptions\ResourceNotFoundException;
 use App\Models\Exhibition;
 use Illuminate\Support\Collection;
 use Laravel\Octane\Exceptions\DdException;
@@ -16,6 +17,18 @@ class MysqlExhibitionRepository implements ExhibitionRepositoryInterface
         $data = (array) $exhibition;
         $data['starts_at'] = (string) $exhibition->starts_at;
         Exhibition::query()->create($data);
+    }
+
+    public function findById(string|FilmDTO $input): ExhibitionDTO
+    {
+        $exhibition_id = $input instanceof FilmDTO ? $input->uuid : $input;
+        $exhibition = Exhibition::query()->where('uuid', $exhibition_id)->first();
+
+        if (empty($exhibition)) {
+            throw new ResourceNotFoundException('Exhibition was not found: ' . $exhibition_id, 404);
+        }
+
+        return $exhibition->toDto();
     }
 
     /**
@@ -41,5 +54,10 @@ class MysqlExhibitionRepository implements ExhibitionRepositoryInterface
             ->where('is_active', true)
             ->get()
             ->map(fn (Exhibition $exhibition) => $exhibition->toDTO());
+    }
+
+    public function update(ExhibitionDTO $exhibition): void
+    {
+        Exhibition::where('uuid', $exhibition->uuid)->update((array) $exhibition);
     }
 }

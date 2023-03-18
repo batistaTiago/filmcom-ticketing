@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Domain\DTO\ExhibitionDTO;
 use App\Domain\Services\RoomAvailabilityServiceInterface;
+use App\Exceptions\ResourceNotFoundException;
 use App\Http\Requests\CreateExhibitionRequest;
 use App\Http\Requests\UpdateExhibitionRequest;
 use App\Models\Exhibition;
 use App\UseCases\CreateExhibitionUseCase;
 use App\UseCases\ListExhibitionTicketTypesUseCase;
 use App\UseCases\ListFilmExhibitionsUseCase;
+use App\UseCases\UpdateExhibitionUseCase;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -33,19 +35,9 @@ class ExhibitionController
         return response()->json($useCase->execute($request->exhibition_id));
     }
 
-    public function update(UpdateExhibitionRequest $request)
+    public function update(UpdateExhibitionRequest $request, UpdateExhibitionUseCase $useCase)
     {
-        // TODO layerize this code
-        $exhibitionDTO = Exhibition::where('uuid', $request->exhibition_id)->first();
-
-        $updatedDtoData = array_merge(
-            Arr::only($exhibitionDTO->toArray(), ExhibitionDTO::ATTRIBUTES),
-            $request->validated(),
-            ['starts_at' => Carbon::parse($request->starts_at)->toTimeString()]
-        );
-
-        resolve(RoomAvailabilityServiceInterface::class)->validate(ExhibitionDTO::fromArray($updatedDtoData));
-        Exhibition::where('uuid', $request->exhibition_id)->update($updatedDtoData);
+        $useCase->execute($request->exhibition_id, $request->validated());
         return response()->json(['success' => true]);
     }
 }
