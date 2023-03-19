@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Domain\DTO\TheaterRoom\TheaterRoomDTO;
 use App\Domain\Repositories\TheaterRoomRepositoryInterface;
 use App\Exceptions\ResourceNotFoundException;
+use App\Models\Exhibition;
 use App\Models\TheaterRoom;
 
 class MysqlTheaterRoomRepository implements TheaterRoomRepositoryInterface
@@ -21,8 +22,10 @@ class MysqlTheaterRoomRepository implements TheaterRoomRepositoryInterface
         return $entry->toDTO();
     }
 
-    public function findRoomAvailability(string $theaterRoomUuid, string $exhibitionUuid): mixed
+    public function findRoomAvailability(string $exhibitionUuid): mixed
     {
+        $exhibition = Exhibition::query()->where('uuid', $exhibitionUuid)->first();
+
         $entry = TheaterRoom::query()
             ->with('rows.seats.type')
             ->with([
@@ -30,7 +33,7 @@ class MysqlTheaterRoomRepository implements TheaterRoomRepositoryInterface
                     $builder->with('seat_status')->where('exhibition_id', $exhibitionUuid);
                 }
             ])
-            ->where(['uuid' => $theaterRoomUuid])
+            ->where(['uuid' => $exhibition->theater_room_id])
             ->first();
 
         if (!$entry) {
@@ -38,5 +41,10 @@ class MysqlTheaterRoomRepository implements TheaterRoomRepositoryInterface
         }
 
         return $entry->toDTO();
+    }
+
+    public function create(TheaterRoomDTO $dto): void
+    {
+        TheaterRoom::query()->create((array) $dto);
     }
 }

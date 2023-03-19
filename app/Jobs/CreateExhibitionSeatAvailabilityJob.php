@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Str;
 
 class CreateExhibitionSeatAvailabilityJob implements ShouldQueue
 {
@@ -27,8 +28,8 @@ class CreateExhibitionSeatAvailabilityJob implements ShouldQueue
     public function tags(): array
     {
         return [
-            "create-exhibition-seat-availability",
-            "create-exhibition-seat-availability:{$this->exhibition->uuid}",
+            "process-seat-map-spreadsheet",
+            "process-seat-map-spreadsheet:" . Str::orderedUuid()->toString(),
         ];
     }
 }

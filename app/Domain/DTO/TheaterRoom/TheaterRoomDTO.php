@@ -12,9 +12,16 @@ class TheaterRoomDTO
     /** @var TheaterRoomRowDTO[] */
     public array $rows;
 
+    public const ATTRIBUTES = [
+        'uuid',
+        'name',
+        'theater_id'
+    ];
+
     public function __construct(
         string $uuid,
         string $name,
+        string $theater_id,
         array $rows = [],
     ) {
         if (empty($name)) {
@@ -27,6 +34,12 @@ class TheaterRoomDTO
 
         $this->uuid = $uuid;
         $this->name = $name;
+        $this->theater_id = $theater_id;
         $this->rows = $rows;
+    }
+
+    public static function fromArray(array $data): static
+    {
+        return new static(...array_intersect_key($data, array_flip(self::ATTRIBUTES)));
     }
 }

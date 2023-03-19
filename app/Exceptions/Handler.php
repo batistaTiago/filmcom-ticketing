@@ -2,9 +2,9 @@
 
 namespace App\Exceptions;
 
+use DomainException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -50,13 +50,24 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
-        if ($e instanceof \DomainException) {
+        if ($e instanceof DomainException) {
             return response()->json([
                 'error' => config('app.debug') ? $e->getMessage () : 'Server Error',
                 'trace' => config('app.debug') ? $e->getTrace() : null
             ], ($e->getCode() ?? 400));
         }
 
-        return parent::render($request, $e);
+        if ($e instanceof AuthenticationException) {
+            return response()->json([
+                'error' => 'Unauthenticated'
+            ], 401);
+        }
+
+        parent::render($request, $e);
+    }
+
+    protected function shouldReturnJson($request, Throwable $e): bool
+    {
+        return true;
     }
 }

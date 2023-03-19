@@ -1,8 +1,9 @@
 <?php
 
-namespace app\Services;
+namespace App\Services;
 
 use App\Domain\DTO\ExhibitionDTO;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Collection;
 use Error;
 use Exception;
@@ -16,11 +17,15 @@ use Illuminate\Support\Facades\DB;
 
 class PopulateExhibitionSeatsService
 {
+    public function __construct(private readonly DatabaseManager $databaseManager)
+    {
+    }
+
     public function execute(ExhibitionDTO $exhibition)
     {
         try {
             // TODO layerize this code
-            DB::beginTransaction();
+            $this->databaseManager->beginTransaction();
             $rows = TheaterRoomRow::with('seats')->where('theater_room_id', $exhibition->theater_room_id)->get();
             $defaultSeatStatus = SeatStatus::where(['name' => SeatStatus::DEFAULT])->first();
 
@@ -29,9 +34,9 @@ class PopulateExhibitionSeatsService
             }
 
             ExhibitionSeat::query()->insert($this->getInsertData($rows, $defaultSeatStatus, $exhibition));
-            DB::commit();
+            $this->databaseManager->commit();
         } catch (Exception $e) {
-            DB::rollBack();
+            $this->databaseManager->rollBack();
             throw $e;
         }
     }

@@ -37,6 +37,7 @@ class TheaterRoom extends Model
         return new TheaterRoomDTO(
             uuid: $data['uuid'],
             name: $data['name'],
+            theater_id: $data['theater_id'],
             rows: !empty($data['rows']) ? $this->convertRowsToDTO($this->rows) : []
         );
     }

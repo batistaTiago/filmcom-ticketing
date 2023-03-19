@@ -101,7 +101,7 @@ class ShowTheaterRoomTest extends TestCase
             }
         }
 
-        $res = $this->get(route('api.theater-rooms.show-availability', [$room->uuid, $exhibitions->first()->uuid]))
+        $res = $this->get(route('api.theater-rooms.show-availability', [$exhibitions->first()->uuid]))
             ->assertOk()
             ->assertJsonStructure([
                 'uuid',

@@ -40,6 +40,8 @@ class MysqlExhibitionRepository implements ExhibitionRepositoryInterface
 
         return Exhibition::query()
             ->where(compact('film_id'))
+            ->orderBy('day_of_week')
+            ->orderBy('starts_at')
             ->get()
             ->map(fn (Exhibition $exhibition) => $exhibition->toDTO());
     }

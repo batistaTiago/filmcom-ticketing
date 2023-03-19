@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\ExhibitionSeat;
 use App\Models\Film;
 use App\Models\SeatStatus;
 use App\Models\Theater;
@@ -28,5 +29,13 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call(SeederFakeDataForTesting::class);
+
+
+        // shuffling seat statuses
+//        $seats = ExhibitionSeat::query()->get();
+//        $seat_statuses = SeatStatus::query()->where('name', '!=', 'unavailable')->get();
+//        $seats->each(function ($seat) use ($seat_statuses) {
+//            $seat->update(['seat_status_id' => $seat_statuses->random()->uuid]);
+//        });
     }
 }
