@@ -63,7 +63,7 @@ class Handler extends ExceptionHandler
             ], 401);
         }
 
-        parent::render($request, $e);
+        return parent::render($request, $e);
     }
 
     protected function shouldReturnJson($request, Throwable $e): bool

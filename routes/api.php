@@ -8,12 +8,6 @@ use App\Http\Controllers\TheaterController;
 use App\Http\Controllers\TicketTypeController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/me', function () {
-        return response()->json(['user' => auth()->user()]);
-    });
-});
-
 Route::prefix('films')->group(function () {
     Route::get('/', [FilmController::class, 'index'])->name('api.films.index');
     Route::post('/', [FilmController::class, 'store'])->name('api.films.create');

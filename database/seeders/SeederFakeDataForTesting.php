@@ -8,6 +8,7 @@ use App\Models\Theater;
 use App\Models\TheaterRoom;
 use App\Models\TheaterRoomRow;
 use App\Models\TheaterRoomSeat;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -15,6 +16,7 @@ class SeederFakeDataForTesting extends Seeder
 {
     public function run(): void
     {
+        User::factory()->create(['email' => 'user@test.dev']);
         Film::factory()->times(15)->create();
         $theaters = Theater::factory()->times(3)->create();
         $seatTypes = SeatType::all();
