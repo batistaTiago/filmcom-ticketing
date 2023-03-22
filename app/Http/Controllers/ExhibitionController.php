@@ -26,8 +26,8 @@ class ExhibitionController
 
     public function store(CreateExhibitionRequest $request, CreateExhibitionUseCase $useCase)
     {
-        $data = array_merge($request->validated(), ['uuid' => Str::orderedUuid()->toString()]);
-        return response()->json($useCase->execute($data), 201);
+        $data = array_merge($request->validated()['exhibition'], ['uuid' => Str::orderedUuid()->toString()]);
+        return response()->json($useCase->execute($data, $request->ticket_type_ids ?? []), 201);
     }
 
     public function getTicketTypes(Request $request, ListExhibitionTicketTypesUseCase $useCase)

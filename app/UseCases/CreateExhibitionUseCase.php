@@ -6,6 +6,7 @@ use App\Domain\DTO\ExhibitionDTO;
 use App\Domain\Repositories\ExhibitionRepositoryInterface;
 use App\Domain\Services\RoomAvailabilityServiceInterface;
 use App\Jobs\CreateExhibitionSeatAvailabilityJob;
+use App\Jobs\CreateExhibitionTicketTypeAvailabilityJob;
 
 class CreateExhibitionUseCase
 {
@@ -15,14 +16,15 @@ class CreateExhibitionUseCase
     )
     { }
 
-    public function execute(array $data): ExhibitionDTO
+    public function execute(array $exhibitionData, array $ticketTypeUuids): ExhibitionDTO
     {
-        $newExhibition = ExhibitionDTO::fromArray($data);
+        $newExhibition = ExhibitionDTO::fromArray($exhibitionData);
         $this->roomAvailabilityService->validate($newExhibition);
         $this->exhibitionRepository->create($newExhibition);
 
         // TODO move to a job dispatcher interface
         CreateExhibitionSeatAvailabilityJob::dispatch($newExhibition);
+        CreateExhibitionTicketTypeAvailabilityJob::dispatch($newExhibition, $ticketTypeUuids);
 
         return $newExhibition;
     }

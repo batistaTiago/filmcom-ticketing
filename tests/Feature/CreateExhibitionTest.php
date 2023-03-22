@@ -4,12 +4,14 @@ namespace Tests\Feature;
 
 use App\Jobs\CreateExhibitionSeatAvailabilityJob;
 use App\Models\Exhibition;
+use App\Models\ExhibitionTicketType;
 use App\Models\Film;
 use App\Models\SeatStatus;
 use App\Models\SeatType;
 use App\Models\TheaterRoom;
 use App\Models\TheaterRoomRow;
 use App\Models\TheaterRoomSeat;
+use App\Models\TicketType;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Bus;
@@ -32,11 +34,11 @@ class CreateExhibitionTest extends TestCase
     {
         Bus::fake();
 
-        Film::factory()->create(['uuid' => $sampleData['film_id']]);
-        TheaterRoom::factory()->create(['uuid' => $sampleData['theater_room_id']]);
+        Film::factory()->create(['uuid' => $sampleData['exhibition']['film_id']]);
+        TheaterRoom::factory()->create(['uuid' => $sampleData['exhibition']['theater_room_id']]);
 
         $this->postJson(route('api.exhibitions.create'), $sampleData)->assertCreated();
-        $this->assertDatabaseHas('exhibitions', $sampleData);
+        $this->assertDatabaseHas('exhibitions', $sampleData['exhibition']);
 
         Bus::assertDispatchedTimes(CreateExhibitionSeatAvailabilityJob::class, 1);
     }
@@ -45,14 +47,14 @@ class CreateExhibitionTest extends TestCase
      * @test
      * @dataProvider validExhibitionData
      */
-    public function should_populate_the_seat_statuses_for_a_newly_created_exhibition($sampleData)
+    public function should_populate_the_seat_statuses_on_exhibition_creation($sampleData)
     {
-        Film::factory()->create(['uuid' => $sampleData['film_id']]);
-        $room = TheaterRoom::factory()->create(['uuid' => $sampleData['theater_room_id']]);
+        Film::factory()->create(['uuid' => $sampleData['exhibition']['film_id']]);
+        $room = TheaterRoom::factory()->create(['uuid' => $sampleData['exhibition']['theater_room_id']]);
+        $seatType = SeatType::factory()->create();
 
         $rowCount = rand(2, 3);
         $seatCount = rand(3, 4);
-        $seatType = SeatType::factory()->create();
 
         for ($i = 0; $i < $rowCount; $i++) {
             $row = TheaterRoomRow::factory()->create([
@@ -79,15 +81,95 @@ class CreateExhibitionTest extends TestCase
 
     /**
      * @test
+     */
+    public function should_populate_the_available_ticket_types_on_exhibition_creation()
+    {
+        $sampleData = [
+            'exhibition' => [
+                'film_id' => fake()->uuid,
+                'theater_room_id' => fake()->uuid,
+                'starts_at' => fake()->time,
+                'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
+                'is_active' => true,
+            ],
+        ];
+
+        $regularTicketType = TicketType::factory()->create([
+            'name' => TicketType::REGULAR
+        ]);
+
+        $studentTicketType = TicketType::factory()->create([
+            'name' => TicketType::STUDENT
+        ]);
+
+        Film::factory()->create(['uuid' => $sampleData['exhibition']['film_id']]);
+        TheaterRoom::factory()->create(['uuid' => $sampleData['exhibition']['theater_room_id']]);
+
+        $this->postJson(route('api.exhibitions.create'), $sampleData)
+            ->assertCreated()
+            ->decodeResponseJson();
+
+        $this->assertDatabaseHas('exhibition_ticket_types', [
+            'ticket_type_id' => $regularTicketType->uuid
+        ]);
+
+        $this->assertDatabaseHas('exhibition_ticket_types', [
+            'ticket_type_id' => $studentTicketType->uuid
+        ]);
+    }
+
+    /** @test */
+    public function should_populate_the_selected__ticket_types_on_exhibition_creation()
+    {
+        $sampleData = [
+            'exhibition' => [
+                'film_id' => fake()->uuid,
+                'theater_room_id' => fake()->uuid,
+                'starts_at' => fake()->time,
+                'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
+                'is_active' => true,
+            ],
+        ];
+
+        $regularTicketType = TicketType::factory()->create([
+            'name' => TicketType::REGULAR
+        ]);
+
+        $studentTicketType = TicketType::factory()->create([
+            'name' => TicketType::STUDENT
+        ]);
+
+        Film::factory()->create(['uuid' => $sampleData['exhibition']['film_id']]);
+        TheaterRoom::factory()->create(['uuid' => $sampleData['exhibition']['theater_room_id']]);
+
+        $sampleData['ticket_type_ids'] = [
+            $regularTicketType->uuid,
+        ];
+
+        $this->postJson(route('api.exhibitions.create'), $sampleData)
+            ->assertCreated()
+            ->decodeResponseJson();
+
+        $this->assertDatabaseHas('exhibition_ticket_types', [
+            'ticket_type_id' => $regularTicketType->uuid
+        ]);
+
+        $this->assertDatabaseMissing('exhibition_ticket_types', [
+            'ticket_type_id' => $studentTicketType->uuid
+        ]);
+    }
+
+    /**
+     * @test
      * @dataProvider invalidExhibitionData
      */
     public function should_validate_the_data_before_inserting_the_data($sampleData)
     {
-        Film::factory()->create(['uuid' => $sampleData['film_id']]);
-        TheaterRoom::factory()->create(['uuid' => $sampleData['theater_room_id']]);
+        Film::factory()->create(['uuid' => $sampleData['exhibition']['film_id']]);
+        TheaterRoom::factory()->create(['uuid' => $sampleData['exhibition']['theater_room_id']]);
 
         $this->postJson(route('api.exhibitions.create'), $sampleData)->assertBadRequest();
-        $this->assertDatabaseMissing('exhibitions', $sampleData);
+        $this->assertDatabaseMissing('exhibitions', $sampleData['exhibition']);
         $this->assertDatabaseCount('exhibitions', 0);
     }
 
@@ -118,11 +200,13 @@ class CreateExhibitionTest extends TestCase
         $newFilm = Film::factory()->create(compact('duration'));
 
         $this->postJson(route('api.exhibitions.create'), [
-            'film_id' => $newFilm->uuid,
-            'theater_room_id' => $room->uuid,
-            'starts_at' => $starts_at,
-            'day_of_week' => CarbonInterface::SUNDAY,
-            'is_active' => true,
+            'exhibition' => [
+                'film_id' => $newFilm->uuid,
+                'theater_room_id' => $room->uuid,
+                'starts_at' => $starts_at,
+                'day_of_week' => CarbonInterface::SUNDAY,
+                'is_active' => true,
+            ],
         ])
             ->assertStatus($expectedStatus);
     }
@@ -132,29 +216,35 @@ class CreateExhibitionTest extends TestCase
         return [
             [
                 [
-                    'film_id' => fake()->uuid,
-                    'theater_room_id' => fake()->uuid,
-                    'starts_at' => fake()->time,
-                    'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
-                    'is_active' => true,
+                    'exhibition' => [
+                        'film_id' => fake()->uuid,
+                        'theater_room_id' => fake()->uuid,
+                        'starts_at' => fake()->time,
+                        'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
+                        'is_active' => true,
+                    ],
                 ],
             ],
             [
                 [
-                    'film_id' => fake()->uuid,
-                    'theater_room_id' => fake()->uuid,
-                    'starts_at' => fake()->time,
-                    'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
-                    'is_active' => true,
+                    'exhibition' => [
+                        'film_id' => fake()->uuid,
+                        'theater_room_id' => fake()->uuid,
+                        'starts_at' => fake()->time,
+                        'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
+                        'is_active' => true,
+                    ],
                 ],
             ],
             [
                 [
-                    'film_id' => fake()->uuid,
-                    'theater_room_id' => fake()->uuid,
-                    'starts_at' => fake()->time,
-                    'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
-                    'is_active' => false,
+                    'exhibition' => [
+                        'film_id' => fake()->uuid,
+                        'theater_room_id' => fake()->uuid,
+                        'starts_at' => fake()->time,
+                        'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
+                        'is_active' => false,
+                    ],
                 ],
             ],
         ];
@@ -165,29 +255,35 @@ class CreateExhibitionTest extends TestCase
         return [
             [
                 [
-                    'film_id' => fake()->uuid,
-                    'theater_room_id' => fake()->uuid,
-                    'starts_at' => fake()->dateTime,
-                    'day_of_week' => 0,
-                    'is_active' => true,
+                    'exhibition' => [
+                        'film_id' => fake()->uuid,
+                        'theater_room_id' => fake()->uuid,
+                        'starts_at' => fake()->dateTime,
+                        'day_of_week' => 0,
+                        'is_active' => true,
+                    ],
                 ],
             ],
             [
                 [
-                    'film_id' => fake()->uuid,
-                    'theater_room_id' => fake()->uuid,
-                    'starts_at' => fake()->time,
-                    'day_of_week' => -1,
-                    'is_active' => true,
+                    'exhibition' => [
+                        'film_id' => fake()->uuid,
+                        'theater_room_id' => fake()->uuid,
+                        'starts_at' => fake()->time,
+                        'day_of_week' => -1,
+                        'is_active' => true,
+                    ],
                 ],
             ],
             [
                 [
-                    'film_id' => fake()->uuid,
-                    'theater_room_id' => fake()->uuid,
-                    'starts_at' => fake()->time,
-                    'day_of_week' => 10,
-                    'is_active' => true,
+                    'exhibition' => [
+                        'film_id' => fake()->uuid,
+                        'theater_room_id' => fake()->uuid,
+                        'starts_at' => fake()->time,
+                        'day_of_week' => 10,
+                        'is_active' => true,
+                    ],
                 ],
             ]
         ];
@@ -208,6 +304,44 @@ class CreateExhibitionTest extends TestCase
             [30, '09:59', false, 201],
             [180, '14:59', false, 201],
             [600, '14:30', false, 201],
+        ];
+    }
+
+    public static function exhibitionWithTicketTypes(): array
+    {
+        return [
+            [
+                'exhibition_data' => [
+                    'film_id' => fake()->uuid,
+                    'theater_room_id' => fake()->uuid,
+                    'starts_at' => fake()->time,
+                    'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
+                    'is_active' => true,
+                ],
+                'ticket_type_data' => [
+                    ['name' => fake()->name],
+                ]
+            ],
+
+
+            [
+                'exhibition_data' => [
+                    'film_id' => fake()->uuid,
+                    'theater_room_id' => fake()->uuid,
+                    'starts_at' => fake()->time,
+                    'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
+                    'is_active' => true,
+                ],
+                'ticket_type_data' => [
+                    ['name' => fake()->name],
+                    ['name' => fake()->name],
+                ]
+            ],
+
+
+            [],
+
+
         ];
     }
 }

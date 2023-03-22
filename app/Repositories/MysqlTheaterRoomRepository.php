@@ -37,7 +37,7 @@ class MysqlTheaterRoomRepository implements TheaterRoomRepositoryInterface
             ->first();
 
         if (!$entry) {
-            throw new ResourceNotFoundException("Theater room was not found: $theaterRoomUuid", 404);
+            throw new ResourceNotFoundException("Theater room was not found: $exhibition->theater_room_id", 404);
         }
 
         return $entry->toDTO();

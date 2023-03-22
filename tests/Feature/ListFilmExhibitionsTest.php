@@ -10,6 +10,7 @@ use App\Models\TheaterRoom;
 use App\Models\TheaterRoomRow;
 use App\Models\TheaterRoomSeat;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ListFilmExhibitionsTest extends TestCase
@@ -19,20 +20,28 @@ class ListFilmExhibitionsTest extends TestCase
     /** @test */
     public function should_list_all_the_exhibitions_for_a_film()
     {
+        $rooms = collect();
 
         $film = Film::factory()->create();
         $theater = Theater::factory()->create();
-        $rooms = TheaterRoom::factory()->times(2)->create(['theater_id' => $theater->uuid]);
-
         $seatType = SeatType::factory()->create();
 
-        foreach ($rooms as $room) {
-            $rows[$room->uuid] = TheaterRoomRow::factory()->times(3)->create([
+        $rowCount = rand(2, 3);
+        $seatCount = rand(3, 4);
+
+        for ($i = 0; $i < $rowCount; $i++) {
+            $room = TheaterRoom::factory()->create(['theater_id' => $theater->uuid]);
+            $rooms[] = $room;
+
+            $row = TheaterRoomRow::factory()->create([
+                'name' => Str::orderedUuid()->toString(),
                 'theater_room_id' => $room->uuid
             ]);
 
-            foreach ($rows[$room->uuid] as $row) {
-                TheaterRoomSeat::factory()->times(4)->create([
+            for ($j = 0; $j < $seatCount; $j++) {
+
+                TheaterRoomSeat::factory()->create([
+                    'name' => Str::orderedUuid()->toString(),
                     'theater_room_row_id' => $row->uuid,
                     'seat_type_id' => $seatType->uuid
                 ]);
