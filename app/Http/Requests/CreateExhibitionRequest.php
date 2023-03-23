@@ -24,8 +24,9 @@ class CreateExhibitionRequest extends FormRequest
             'exhibition.starts_at' => ['required', 'date_format:H:i,H:i:s'],
             'exhibition.day_of_week' => ['required', new DayOfWeekRule()],
             'exhibition.is_active' => ['required', 'boolean'],
-            'ticket_type_ids' => ['sometimes', 'array'],
-            'ticket_type_ids.*' => ['string', 'exists:ticket_types,uuid'],
+            'ticket_types' => ['sometimes', 'array'],
+            'ticket_types.*.uuid' => ['required', 'string', 'exists:ticket_types,uuid'],
+            'ticket_types.*.price' => ['required', 'integer', 'min:0'],
         ];
     }
 }

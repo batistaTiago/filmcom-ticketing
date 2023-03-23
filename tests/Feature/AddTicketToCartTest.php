@@ -34,7 +34,7 @@ class AddTicketToCartTest extends TestCase
     }
 
     /** @test */
-    public function should_not_allow_unlogged_users_to_add_tickets_to_a_cart()
+    public function should_not_allow_non_logged_users_to_add_tickets_to_a_cart()
     {
         $this->postJson(route('api.tickets.add-to-cart'))->assertUnauthorized();
     }
@@ -52,11 +52,7 @@ class AddTicketToCartTest extends TestCase
     /** @test */
     public function should_validate_the_relation_between_the_selected_exhibition_and_ticket_type()
     {
-        ExhibitionSeat::factory()->create([
-            'exhibition_id' => $this->exhibition->uuid,
-            'theater_room_seat_id' => $this->seat->uuid,
-            'seat_status_id' => $this->availableSeatStatus->uuid,
-        ]);
+        $this->populateExhibitionSeats();
 
         $this->actingAs($this->user)->postJson(route('api.tickets.add-to-cart'), [
             'exhibition_id' => $this->exhibition->uuid,
@@ -68,10 +64,7 @@ class AddTicketToCartTest extends TestCase
     /** @test */
     public function should_validate_the_relation_between_the_selected_exhibition_seat_and_seat_status()
     {
-        ExhibitionTicketType::factory()->create([
-            'exhibition_id' => $this->exhibition->uuid,
-            'ticket_type_id' => $this->ticketType->uuid
-        ]);
+        $this->populateExhibitionTicketTypes();
 
         ExhibitionSeat::factory()->create([
             'exhibition_id' => $this->exhibition->uuid,
@@ -87,18 +80,10 @@ class AddTicketToCartTest extends TestCase
     }
 
     /** @test */
-    public function should_create_a_cart_if_no_cart_id_is_provided()
+    public function should_create_a_cart_for_the_logged_user_if_no_cart_id_is_provided()
     {
-        ExhibitionTicketType::factory()->create([
-            'exhibition_id' => $this->exhibition->uuid,
-            'ticket_type_id' => $this->ticketType->uuid
-        ]);
-
-        ExhibitionSeat::factory()->create([
-            'exhibition_id' => $this->exhibition->uuid,
-            'theater_room_seat_id' => $this->seat->uuid,
-            'seat_status_id' => $this->availableSeatStatus->uuid,
-        ]);
+        $this->populateExhibitionTicketTypes();
+        $this->populateExhibitionSeats();
 
         $this->actingAs($this->user)->postJson(route('api.tickets.add-to-cart'), [
             'exhibition_id' => $this->exhibition->uuid,
@@ -114,16 +99,8 @@ class AddTicketToCartTest extends TestCase
     /** @test */
     public function should_create_a_cart_if_the_provided_cart_id_is_not_active()
     {
-        ExhibitionTicketType::factory()->create([
-            'exhibition_id' => $this->exhibition->uuid,
-            'ticket_type_id' => $this->ticketType->uuid
-        ]);
-
-        ExhibitionSeat::factory()->create([
-            'exhibition_id' => $this->exhibition->uuid,
-            'theater_room_seat_id' => $this->seat->uuid,
-            'seat_status_id' => $this->availableSeatStatus->uuid,
-        ]);
+        $this->populateExhibitionTicketTypes();
+        $this->populateExhibitionSeats();
 
         $cart = Cart::factory()->create([
             'user_id' => $this->user->uuid,
@@ -143,16 +120,8 @@ class AddTicketToCartTest extends TestCase
     /** @test */
     public function should_change_the_availability_of_the_exhibition_seat_to_reserved_on_ticket_creation()
     {
-        ExhibitionTicketType::factory()->create([
-            'exhibition_id' => $this->exhibition->uuid,
-            'ticket_type_id' => $this->ticketType->uuid
-        ]);
-
-        ExhibitionSeat::factory()->create([
-            'exhibition_id' => $this->exhibition->uuid,
-            'theater_room_seat_id' => $this->seat->uuid,
-            'seat_status_id' => $this->availableSeatStatus->uuid,
-        ]);
+        $this->populateExhibitionTicketTypes();
+        $this->populateExhibitionSeats();
 
         $cart = Cart::factory()->create([
             'user_id' => $this->user->uuid,
@@ -176,6 +145,24 @@ class AddTicketToCartTest extends TestCase
             'exhibition_id' => $this->exhibition->uuid,
             'theater_room_seat_id' => $this->seat->uuid,
             'seat_status_id' => $this->reservedSeatStatus->uuid,
+        ]);
+    }
+
+    private function populateExhibitionTicketTypes(): void
+    {
+        ExhibitionTicketType::factory()->create([
+            'exhibition_id' => $this->exhibition->uuid,
+            'ticket_type_id' => $this->ticketType->uuid,
+            'price' => fake()->numberBetween(1000, 5000)
+        ]);
+    }
+
+    private function populateExhibitionSeats(): void
+    {
+        ExhibitionSeat::factory()->create([
+            'exhibition_id' => $this->exhibition->uuid,
+            'theater_room_seat_id' => $this->seat->uuid,
+            'seat_status_id' => $this->availableSeatStatus->uuid,
         ]);
     }
 }

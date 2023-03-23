@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Domain\DTO\ExhibitionDTO;
-use App\Services\PopulateExhibitionTicketTypesService;
+use App\Services\PopulateExhibitionTicketPricingService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -11,7 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Str;
 
-class CreateExhibitionTicketTypeAvailabilityJob implements ShouldQueue
+class PopulateExhibitionTicketPricingJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -19,12 +19,12 @@ class CreateExhibitionTicketTypeAvailabilityJob implements ShouldQueue
 
     public function __construct(
         private readonly ExhibitionDTO $exhibition,
-        private readonly array $ticketTypeUuids
+        private readonly array $ticketTypes
     ) { }
 
-    public function handle(PopulateExhibitionTicketTypesService $service): void
+    public function handle(PopulateExhibitionTicketPricingService $service): void
     {
-        $service->execute($this->exhibition, $this->ticketTypeUuids);
+        $service->execute($this->exhibition, $this->ticketTypes);
     }
 
     public function tags(): array
