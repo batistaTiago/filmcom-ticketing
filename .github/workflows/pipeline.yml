@@ -1,12 +1,10 @@
 name: FilmCOM Continuous Delivery Pipeline
 
 on:
+  pull_request:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - *
 
 jobs:
   build:
