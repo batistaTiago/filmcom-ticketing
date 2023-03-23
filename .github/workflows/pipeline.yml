@@ -34,8 +34,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, pdo_mysql, gd, redis, openswoole
-          coverage: none
+          extensions: mbstring, pdo_mysql, gd, redis, openswoole, xdebug
+          coverage: xdebug
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
