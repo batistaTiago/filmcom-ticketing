@@ -65,10 +65,9 @@ jobs:
           docker build . -t ekyidag/filmcom-ticketing:$COMMIT_TAG -f ./Dockerfile
 
       - name: Push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: ekyidag/filmcom-ticketing:$COMMIT_TAG
+        run: |
+          COMMIT_TAG=$(git rev-parse --short HEAD) && \
+          docker push ekyidag/filmcom-ticketing:$COMMIT_TAG
 
 #      - name: Deploy to Kubernetes
 #        uses: appleboy/kubectl-action@master
