@@ -1,4 +1,4 @@
-FROM ekyidag/base-laravel-php82:v1
+FROM ekyidag/base-laravel-php82:v2
 
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 

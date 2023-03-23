@@ -32,9 +32,7 @@ RUN docker-php-ext-install exif pcntl zip mysqli pdo_mysql \
 
 # INSTALLING AND CONFIGURING GD EXTENSION
 RUN docker-php-ext-configure gd --with-jpeg=/usr/include/ \
-    && docker-php-ext-install gd \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-install gd
 
 RUN apt clean && rm -rf /var/lib/apt/lists/*
 
