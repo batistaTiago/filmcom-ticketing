@@ -17,18 +17,18 @@ use App\Models\SeatStatus;
 use App\Models\TheaterRoomRow;
 use Illuminate\Support\Facades\DB;
 
-class PopulateExhibitionTicketTypesService
+class PopulateExhibitionTicketPricingService
 {
     public function __construct(private readonly DatabaseManager $databaseManager)
     {
     }
 
-    public function execute(ExhibitionDTO $exhibition, array $ticketTypeUuids)
+    public function execute(ExhibitionDTO $exhibition, array $ticketTypes)
     {
         try {
             $this->databaseManager->beginTransaction();
 
-            ExhibitionTicketType::query()->insert($this->getInsertData($exhibition, $ticketTypeUuids));
+            ExhibitionTicketType::query()->insert($this->getInsertData($exhibition, $ticketTypes));
 
             $this->databaseManager->commit();
         } catch (Exception $e) {
@@ -37,18 +37,15 @@ class PopulateExhibitionTicketTypesService
         }
     }
 
-    public function getInsertData(ExhibitionDTO $exhibition, array $ticketTypeUuids): array
+    public function getInsertData(ExhibitionDTO $exhibition, array $ticketTypes): array
     {
-        if (empty($ticketTypeUuids)) {
-            $ticketTypeUuids = TicketType::query()->get()->pluck('uuid')->toArray();
-        }
-
-        return array_map(function ($ticketTypeUuid) use ($exhibition, $ticketTypeUuids) {
+        return array_map(function ($ticketType) use ($exhibition, $ticketTypes) {
             return [
                 'uuid' => Str::orderedUuid()->toString(),
                 'exhibition_id' => $exhibition->uuid,
-                'ticket_type_id' => $ticketTypeUuid,
+                'ticket_type_id' => $ticketType['uuid'],
+                'price' => $ticketType['price'],
             ];
-        }, $ticketTypeUuids);
+        }, $ticketTypes);
     }
 }

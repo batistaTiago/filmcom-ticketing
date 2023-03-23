@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignUuid('exhibition_id')->constrained('exhibitions', 'uuid');
             $table->foreignUuid('ticket_type_id')->constrained('ticket_types', 'uuid');
 
+            $table->bigInteger('price');
+
             $table->unique(['exhibition_id', 'ticket_type_id']);
 
             $table->timestamps();

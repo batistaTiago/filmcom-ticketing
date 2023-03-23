@@ -11,6 +11,13 @@ class ExhibitionTicketType extends Model
     public $primaryKey = 'uuid';
     public $incrementing = false;
 
+    public $fillable = [
+        'uuid',
+        'exhibition_id',
+        'ticket_type_id',
+        'price',
+    ];
+
     public function ticket_type()
     {
         return $this->hasOne(TicketType::class, 'uuid', 'ticket_type_id');

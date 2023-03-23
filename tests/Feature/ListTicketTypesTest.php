@@ -32,7 +32,8 @@ class ListTicketTypesTest extends TestCase
             foreach ($ticketTypes as $ticketType) {
                 ExhibitionTicketType::factory()->create([
                     'exhibition_id' => $exhibition->uuid,
-                    'ticket_type_id' => $ticketType
+                    'ticket_type_id' => $ticketType,
+                    'price' => 5000
                 ]);
             }
         }

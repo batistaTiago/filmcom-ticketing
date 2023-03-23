@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Jobs\CreateExhibitionSeatAvailabilityJob;
+use App\Jobs\PopulateExhibitionTicketPricingJob;
 use App\Models\Exhibition;
 use App\Models\ExhibitionTicketType;
 use App\Models\Film;
@@ -39,8 +40,23 @@ class CreateExhibitionTest extends TestCase
 
         $this->postJson(route('api.exhibitions.create'), $sampleData)->assertCreated();
         $this->assertDatabaseHas('exhibitions', $sampleData['exhibition']);
+    }
+
+    /**
+     * @test
+     * @dataProvider validExhibitionData
+     */
+    public function should_dispatch_jobs_to_populate_seat_availability_and_ticket_prices($sampleData)
+    {
+        Bus::fake();
+
+        Film::factory()->create(['uuid' => $sampleData['exhibition']['film_id']]);
+        TheaterRoom::factory()->create(['uuid' => $sampleData['exhibition']['theater_room_id']]);
+
+        $this->postJson(route('api.exhibitions.create'), $sampleData)->assertCreated();
 
         Bus::assertDispatchedTimes(CreateExhibitionSeatAvailabilityJob::class, 1);
+        Bus::assertDispatchedTimes(PopulateExhibitionTicketPricingJob::class, 1);
     }
 
     /**
@@ -82,7 +98,7 @@ class CreateExhibitionTest extends TestCase
     /**
      * @test
      */
-    public function should_populate_the_available_ticket_types_on_exhibition_creation()
+    public function should_not_populate_the_available_ticket_types_if_no_one_is_provided()
     {
         $sampleData = [
             'exhibition' => [
@@ -94,12 +110,8 @@ class CreateExhibitionTest extends TestCase
             ],
         ];
 
-        $regularTicketType = TicketType::factory()->create([
+        TicketType::factory()->create([
             'name' => TicketType::REGULAR
-        ]);
-
-        $studentTicketType = TicketType::factory()->create([
-            'name' => TicketType::STUDENT
         ]);
 
         Film::factory()->create(['uuid' => $sampleData['exhibition']['film_id']]);
@@ -109,54 +121,43 @@ class CreateExhibitionTest extends TestCase
             ->assertCreated()
             ->decodeResponseJson();
 
-        $this->assertDatabaseHas('exhibition_ticket_types', [
-            'ticket_type_id' => $regularTicketType->uuid
-        ]);
-
-        $this->assertDatabaseHas('exhibition_ticket_types', [
-            'ticket_type_id' => $studentTicketType->uuid
-        ]);
+        $this->assertDatabaseCount('exhibition_ticket_types', 0);
     }
 
-    /** @test */
-    public function should_populate_the_selected__ticket_types_on_exhibition_creation()
+    /**
+     * @test
+     * @dataProvider exhibitionWithTicketTypes
+     */
+    public function should_populate_the_selected_ticket_type_prices_on_exhibition_creation($exhibitionData, $ticketTypesData)
     {
-        $sampleData = [
-            'exhibition' => [
-                'film_id' => fake()->uuid,
-                'theater_room_id' => fake()->uuid,
-                'starts_at' => fake()->time,
-                'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
-                'is_active' => true,
-            ],
-        ];
+        $ticketTypesParam = [];
+        foreach ($ticketTypesData as $ticketTypeData) {
+            TicketType::factory()->create([
+                'uuid' => $ticketTypeData['uuid'],
+                'name' => $ticketTypeData['name'],
+            ]);
 
-        $regularTicketType = TicketType::factory()->create([
-            'name' => TicketType::REGULAR
-        ]);
+            $ticketTypesParam[] = [
+                'uuid' => $ticketTypeData['uuid'],
+                'price' => $ticketTypeData['price'],
+            ];
+        }
 
-        $studentTicketType = TicketType::factory()->create([
-            'name' => TicketType::STUDENT
-        ]);
+        Film::factory()->create(['uuid' => $exhibitionData['film_id']]);
+        TheaterRoom::factory()->create(['uuid' => $exhibitionData['theater_room_id']]);
 
-        Film::factory()->create(['uuid' => $sampleData['exhibition']['film_id']]);
-        TheaterRoom::factory()->create(['uuid' => $sampleData['exhibition']['theater_room_id']]);
-
-        $sampleData['ticket_type_ids'] = [
-            $regularTicketType->uuid,
-        ];
-
-        $this->postJson(route('api.exhibitions.create'), $sampleData)
+        $this->postJson(route('api.exhibitions.create'), [
+            'exhibition' => $exhibitionData,
+            'ticket_types' => $ticketTypesParam
+        ])
             ->assertCreated()
             ->decodeResponseJson();
 
-        $this->assertDatabaseHas('exhibition_ticket_types', [
-            'ticket_type_id' => $regularTicketType->uuid
-        ]);
-
-        $this->assertDatabaseMissing('exhibition_ticket_types', [
-            'ticket_type_id' => $studentTicketType->uuid
-        ]);
+        foreach ($ticketTypesData as $ticketTypeData) {
+            $this->assertDatabaseHas('exhibition_ticket_types', [
+                'ticket_type_id' => $ticketTypeData['uuid']
+            ]);
+        }
     }
 
     /**
@@ -318,12 +319,8 @@ class CreateExhibitionTest extends TestCase
                     'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
                     'is_active' => true,
                 ],
-                'ticket_type_data' => [
-                    ['name' => fake()->name],
-                ]
+                'ticket_type_data' => []
             ],
-
-
             [
                 'exhibition_data' => [
                     'film_id' => fake()->uuid,
@@ -333,15 +330,34 @@ class CreateExhibitionTest extends TestCase
                     'is_active' => true,
                 ],
                 'ticket_type_data' => [
-                    ['name' => fake()->name],
-                    ['name' => fake()->name],
+                    [
+                        'uuid' => fake()->uuid,
+                        'name' => TicketType::REGULAR,
+                        'price' => 4000,
+                    ],
                 ]
             ],
-
-
-            [],
-
-
+            [
+                'exhibition_data' => [
+                    'film_id' => fake()->uuid,
+                    'theater_room_id' => fake()->uuid,
+                    'starts_at' => fake()->time,
+                    'day_of_week' => fake()->numberBetween(CarbonInterface::SUNDAY, CarbonInterface::SATURDAY),
+                    'is_active' => true,
+                ],
+                'ticket_type_data' => [
+                    [
+                        'uuid' => fake()->uuid,
+                        'name' => TicketType::REGULAR,
+                        'price' => 4000,
+                    ],
+                    [
+                        'uuid' => fake()->uuid,
+                        'name' => TicketType::STUDENT,
+                        'price' => 2000,
+                    ],
+                ]
+            ],
         ];
     }
 }
