@@ -47,14 +47,6 @@ jobs:
           cp .env.example .env
           php artisan key:generate
 
-      - name: List directory contents
-        run: ls -R
-
-      - name: Copy sample_seat_map.xlsx
-        run: |
-          mkdir -p storage/app
-          cp sample_seat_map.xlsx storage/app/sample_seat_map.xlsx
-
       - name: Run tests
         env:
           DB_CONNECTION: mysql
