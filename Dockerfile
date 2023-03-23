@@ -51,12 +51,6 @@ RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev \
 # INSTALLING COMPOSER
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-#RUN groupadd --force -g $WWWGROUP sail
-
-#RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
-
-## COPY ./php.ini /usr/local/etc/php/conf.d/99-sail.ini
-
 COPY . .
 
 RUN composer install
