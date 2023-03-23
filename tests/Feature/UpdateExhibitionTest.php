@@ -3,11 +3,19 @@
 namespace Tests\Feature;
 
 use App\Models\Exhibition;
+use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Tests\TestCase;
 
 class UpdateExhibitionTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Carbon::setTestNow(Carbon::create(2023, 03, 22));
+    }
+
     /** @test */
     public function should_return_not_found_if_no_exhibition_is_found(): void
     {

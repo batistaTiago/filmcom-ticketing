@@ -50,17 +50,16 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
-        if ($e instanceof DomainException) {
-            return response()->json([
-                'error' => config('app.debug') ? $e->getMessage () : 'Server Error',
-                'trace' => config('app.debug') ? $e->getTrace() : null
-            ], ($e->getCode() ?? 400));
+        if ($e instanceof AuthenticationException) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
         }
 
-        if ($e instanceof AuthenticationException) {
+        $httpStatus = ($e->getCode() !== 0) ? $e->getCode() : 400;
+        if ($e instanceof DomainException) {
             return response()->json([
-                'error' => 'Unauthenticated'
-            ], 401);
+                'error' => $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTrace() : null
+            ], $httpStatus);
         }
 
         return parent::render($request, $e);

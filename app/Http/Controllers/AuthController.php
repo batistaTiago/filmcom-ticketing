@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 
 // TODO layerize this code
 
-class AuthController extends Controller
+class AuthController
 {
     public function login(
         LoginRequest $request,

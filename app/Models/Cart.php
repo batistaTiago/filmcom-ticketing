@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Ticket extends Model
+class Cart extends Model
 {
     use HasFactory;
 
@@ -14,9 +14,7 @@ class Ticket extends Model
 
     public $fillable = [
         'uuid',
-        'exhibition_id',
-        'ticket_type_id',
-        'theater_room_seat_id',
-        'cart_id'
+        'user_id',
+        'cart_status_id',
     ];
 }

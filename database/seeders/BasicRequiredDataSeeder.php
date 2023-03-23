@@ -1,8 +1,9 @@
 <?php
 
-namespace database\seeders;
+namespace Database\Seeders;
 
 use App\Models\Film;
+use App\Models\CartStatus;
 use App\Models\SeatStatus;
 use App\Models\SeatType;
 use App\Models\Theater;
@@ -29,5 +30,11 @@ class BasicRequiredDataSeeder extends Seeder
         SeatType::factory()->create(['name' => SeatType::REGULAR]);
         SeatType::factory()->create(['name' => SeatType::LARGE]);
         SeatType::factory()->create(['name' => SeatType::WHEEL_CHAIR]);
+
+        CartStatus::factory()->create(['name' => CartStatus::ACTIVE]);
+        CartStatus::factory()->create(['name' => CartStatus::AWAITING_PAYMENT]);
+        CartStatus::factory()->create(['name' => CartStatus::FINISHED]);
+        CartStatus::factory()->create(['name' => CartStatus::EXPIRED]);
+        CartStatus::factory()->create(['name' => CartStatus::CANCELED]);
     }
 }

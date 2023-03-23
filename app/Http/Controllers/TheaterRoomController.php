@@ -9,7 +9,7 @@ use App\UseCases\ShowTheaterRoomUseCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-class TheaterRoomController extends Controller
+class TheaterRoomController
 {
     public function store(CreateTheaterRoomRequest $request, CreateTheaterRoomUseCase $useCase)
     {

@@ -27,7 +27,7 @@ class TheaterRoomRow extends Model
 
     public function room()
     {
-        return $this->belongsTo(TheaterRoom::class, 'theater_room_row_id', 'uuid');
+        return $this->belongsTo(TheaterRoom::class, 'theater_room_id', 'uuid');
     }
 
     public function toDTO(): TheaterRoomRowDTO

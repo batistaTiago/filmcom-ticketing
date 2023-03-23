@@ -23,6 +23,10 @@ class TheaterRoomSeat extends Model
         'seat_type_id'
     ];
 
+    public function row()
+    {
+        return $this->belongsTo(TheaterRoomRow::class, 'theater_room_row_id', 'uuid');
+    }
 
     public function type()
     {

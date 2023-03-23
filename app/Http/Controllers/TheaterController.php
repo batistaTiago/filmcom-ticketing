@@ -10,7 +10,7 @@ use App\UseCases\CreateTheaterUseCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-class TheaterController extends Controller
+class TheaterController
 {
 
     public function __construct(private readonly CreateTheaterUseCase $useCase)

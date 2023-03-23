@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateFilmRequest;
-use App\Http\Resources\CreatedFilmJsonResource;
 use App\UseCases\CreateFilmUseCase;
 use App\UseCases\ListFilmsUseCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-class FilmController extends Controller
+class FilmController
 {
     public function index(Request $request, ListFilmsUseCase $useCase)
     {

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignUuid('exhibition_id')->constrained('exhibitions', 'uuid');
             $table->foreignUuid('theater_room_seat_id')->constrained('theater_room_seats', 'uuid');
             $table->foreignUuid('ticket_type_id')->constrained('ticket_types', 'uuid');
+            $table->foreignUuid('cart_id')->nullable()->constrained('carts', 'uuid');
 
             $table->unique(['exhibition_id', 'theater_room_seat_id']);
 
