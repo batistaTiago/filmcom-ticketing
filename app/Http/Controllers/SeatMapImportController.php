@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ImportSeatMapSpreadsheetRequest;
 use App\UseCases\ImportSeatMapSpreadsheetUseCase;
+use Illuminate\Filesystem\FilesystemManager;
 
 class SeatMapImportController
 {
+    public function __construct(private readonly FilesystemManager $fileSystem)
+    { }
+
     public function importSeatMapSpreadsheet(ImportSeatMapSpreadsheetRequest $request, ImportSeatMapSpreadsheetUseCase $useCase)
     {
         $useCase->execute(
@@ -19,7 +23,10 @@ class SeatMapImportController
 
     public function getSeatMapExampleSpreadsheet()
     {
-        $filePath = storage_path('app/sample_seat_map.xlsx');
-        return response()->download($filePath);
+        return response()->download(
+            $this->fileSystem
+                ->disk(config('filesystems.default'))
+                ->path('app/sample_seat_map.xlsx')
+        );
     }
 }

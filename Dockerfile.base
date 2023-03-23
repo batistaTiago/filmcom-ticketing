@@ -1,0 +1,47 @@
+FROM php:8.2
+
+WORKDIR /var/www/html
+
+ARG WWWGROUP=1000
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# INSTALLING LINUX DEPENDENCIES
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libc-client-dev \
+    build-essential \
+    ca-certificates \
+    zip \
+    openssh-client \
+    unzip \
+    git \
+    gosu \
+    unzip \
+    wget \
+    librdkafka-dev \
+    gnupg \
+    libmcrypt-dev \
+    libzip-dev \
+    libxml2-dev \
+    libpng-dev  \
+    libjpeg-dev
+
+# INSTALLING PHP EXTENSIONS WITH DOCKER CMD
+RUN docker-php-ext-install exif pcntl zip mysqli pdo_mysql \
+    && docker-php-source delete
+
+# INSTALLING AND CONFIGURING GD EXTENSION
+RUN docker-php-ext-configure gd --with-jpeg=/usr/include/ \
+    && docker-php-ext-install gd \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt clean && rm -rf /var/lib/apt/lists/*
+
+# INSTALLING PHP EXTENSIONS WITH PECL CMD
+RUN pecl install -o -f redis-5.3.7 openswoole-22.0.0 \
+    &&  rm -rf /tmp/pear \
+    &&  docker-php-ext-enable redis openswoole
+
+# INSTALLING COMPOSER
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

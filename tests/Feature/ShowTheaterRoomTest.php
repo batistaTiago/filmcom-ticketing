@@ -76,19 +76,37 @@ class ShowTheaterRoomTest extends TestCase
         $defaultSeatStatus = SeatStatus::factory()->create(['name' => SeatStatus::DEFAULT]);
 
         $room = TheaterRoom::factory()->create();
-        $rows = TheaterRoomRow::factory()->times(2)->create([
-            'theater_room_id' => $room->uuid
-        ]);
 
-        $exhibitions = Exhibition::factory()->times(2)->create([
-            'theater_room_id' => $room->uuid,
-        ]);
+        $exhibitionCount = 2;
+        $rowCount = 2;
+        $seatsPerRow = 3;
+
+        $exhibitions = collect();
+        $rows = collect();
+
+        for ($i = 0; $i < $exhibitionCount; $i++) {
+            $exhibitions[] = Exhibition::factory()->create([
+                'theater_room_id' => $room->uuid,
+            ]);
+        }
+
+        for ($i = 0; $i < $rowCount; $i++) {
+            $rows[] = TheaterRoomRow::factory()->create([
+                'name' => fake()->uuid,
+                'theater_room_id' => $room->uuid,
+            ]);
+        }
 
         foreach ($rows as $row) {
-            $seats = TheaterRoomSeat::factory()->times(3)->create([
-                'theater_room_row_id' => $row->uuid,
-                'seat_type_id' => $seatType->uuid
-            ]);
+            $seats = [];
+
+            for ($i = 0; $i < $seatsPerRow; $i++) {
+                $seats[] = TheaterRoomSeat::factory()->create([
+                    'name' => fake()->uuid,
+                    'theater_room_row_id' => $row->uuid,
+                    'seat_type_id' => $seatType->uuid
+                ]);
+            }
 
             foreach ($exhibitions as $exhibition) {
                 foreach ($seats as $seat) {
