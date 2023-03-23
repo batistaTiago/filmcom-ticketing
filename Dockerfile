@@ -26,8 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     htop \
     libmcrypt-dev \
     libzip-dev \
-    libxml2-dev \
-    php8.2-gd
+    libxml2-dev
 
 # INSTALLING PHP EXTENSIONS WITH DOCKER CMD
 RUN docker-php-ext-install exif pcntl zip mysqli pdo_mysql \
