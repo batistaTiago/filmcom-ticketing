@@ -36,7 +36,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, pdo_mysql
+          extensions: mbstring, pdo_mysql, gd, redis, openswoole, rdkafka, mongodb
           coverage: none
 
       - name: Install dependencies
