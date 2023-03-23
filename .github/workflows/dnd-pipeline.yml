@@ -1,0 +1,46 @@
+name: Laravel Docker-in-Docker Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:20.10.11-dind
+        env:
+          DOCKER_DRIVER: overlay2
+          DOCKER_HOST: tcp://localhost:2375
+        options: --privileged --health-cmd="docker info" --health-interval=10s --health-timeout=5s --health-retries=3
+        ports:
+          - 2375:2375
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Docker CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+
+      - name: Prepare Docker environment
+        run: |
+          docker network create laravel
+          docker run -d --name mysql --network laravel -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=laravel mysql:5.7
+          docker run -d --name redis --network laravel redis
+
+      - name: Build Docker image
+        run: |
+          docker build -t my-laravel-app .
+
+      - name: Run tests
+        run: |
+          docker run --network laravel --rm -e DB_CONNECTION=mysql -e DB_HOST=mysql -
