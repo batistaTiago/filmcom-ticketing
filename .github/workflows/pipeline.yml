@@ -35,7 +35,7 @@ jobs:
         with:
           php-version: '8.2'
           extensions: mbstring, pdo_mysql, gd, redis, openswoole, xdebug
-          coverage: xdebug
+          coverage: pcov
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
