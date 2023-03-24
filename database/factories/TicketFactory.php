@@ -18,7 +18,7 @@ class TicketFactory extends Factory
             'exhibition_id' => Exhibition::factory(),
             'theater_room_seat_id' => TheaterRoomSeat::factory(),
             'ticket_type_id' => TicketType::factory(),
-            'cart_id' => Cart::factory()->create()
+            'cart_id' => Cart::factory(),
         ];
     }
 }
