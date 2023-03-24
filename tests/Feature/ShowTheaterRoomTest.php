@@ -33,11 +33,16 @@ class ShowTheaterRoomTest extends TestCase
             'theater_room_id' => $room->uuid
         ]);
 
+        $seatCount = 3;
+
         foreach ($rows as $row) {
-            TheaterRoomSeat::factory()->times(3)->create([
-                'theater_room_row_id' => $row->uuid,
-                'seat_type_id' => $seatType->uuid
-            ]);
+            for ($i = 0; $i < $seatCount; $i++) {
+                TheaterRoomSeat::factory()->create([
+                    'name' => fake()->uuid,
+                    'theater_room_row_id' => $row->uuid,
+                    'seat_type_id' => $seatType->uuid
+                ]);
+            }
         }
 
         $res = $this->get(route('api.theater-rooms.show', $room->uuid))

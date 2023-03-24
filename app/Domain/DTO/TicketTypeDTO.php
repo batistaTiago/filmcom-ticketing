@@ -6,6 +6,7 @@ use InvalidArgumentException;
 
 class TicketTypeDTO
 {
+    // TODO use NamedDTO
     public function __construct(public string $name)
     {
         if (empty($name)) {

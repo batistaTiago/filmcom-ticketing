@@ -27,6 +27,11 @@ class ExhibitionSeat extends Model
         return $this->belongsTo(TheaterRoomSeat::class, 'theater_room_seat_id', 'uuid');
     }
 
+    public function exhibition()
+    {
+        return $this->belongsTo(Exhibition::class, 'exhibition_id', 'uuid');
+    }
+
     public function seat_status()
     {
         return $this->belongsTo(SeatStatus::class, 'seat_status_id', 'uuid');

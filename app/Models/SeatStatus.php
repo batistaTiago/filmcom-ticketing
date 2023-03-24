@@ -20,8 +20,8 @@ class SeatStatus extends Model
 
     public const DEFAULT = self::AVAILABLE;
 
-    public function exhibition_seat()
+    public function exhibition_seats()
     {
-        return $this->belongsTo(ExhibitionSeat::class, 'seat_status_id', 'uuid');
+        return $this->hasMany(ExhibitionSeat::class, 'seat_status_id', 'uuid');
     }
 }

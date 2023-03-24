@@ -22,7 +22,7 @@ class MysqlTheaterRoomRepository implements TheaterRoomRepositoryInterface
         return $entry->toDTO();
     }
 
-    public function findRoomAvailability(string $exhibitionUuid): mixed
+    public function findRoomAvailability(string $exhibitionUuid): TheaterRoomDTO
     {
         $exhibition = Exhibition::query()->where('uuid', $exhibitionUuid)->first();
 

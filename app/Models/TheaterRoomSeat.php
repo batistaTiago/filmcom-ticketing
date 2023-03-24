@@ -39,6 +39,11 @@ class TheaterRoomSeat extends Model
         return $this->hasMany(ExhibitionSeat::class, 'theater_room_seat_id', 'uuid');
     }
 
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'theater_room_seat_id', 'uuid');
+    }
+
     public function availabilityStatus()
     {
 //        return $this->through('exhibition_seats')->has('seat_status');
@@ -63,7 +68,7 @@ class TheaterRoomSeat extends Model
         return new TheaterRoomSeatDTO(
             uuid: $data['uuid'],
             name: $data['name'],
-            type: new TheaterRoomSeatTypeDTO($data['type']['name'] ?? SeatType::REGULAR),
+            type: TheaterRoomSeatTypeDTO::fromArray($data['type']),
             status: $status,
         );
     }

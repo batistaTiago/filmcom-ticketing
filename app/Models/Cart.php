@@ -17,4 +17,9 @@ class Cart extends Model
         'user_id',
         'cart_status_id',
     ];
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'cart_id', 'uuid');
+    }
 }

@@ -13,10 +13,8 @@ class CreateExhibitionUseCase
 {
     public function __construct(
         private readonly ExhibitionRepositoryInterface $exhibitionRepository,
-        private readonly RoomAvailabilityServiceInterface $roomAvailabilityService,
-        private readonly Dispatcher $dispatcher,
-    )
-    { }
+        private readonly RoomAvailabilityServiceInterface $roomAvailabilityService
+    ) { }
 
     public function execute(array $exhibitionData, array $ticketTypes): ExhibitionDTO
     {
@@ -24,8 +22,8 @@ class CreateExhibitionUseCase
         $this->roomAvailabilityService->validate($newExhibition);
         $this->exhibitionRepository->create($newExhibition);
 
-        $this->dispatcher->dispatch(new CreateExhibitionSeatAvailabilityJob($newExhibition));
-        $this->dispatcher->dispatch(new PopulateExhibitionTicketPricingJob($newExhibition, $ticketTypes));
+        CreateExhibitionSeatAvailabilityJob::dispatch($newExhibition);
+        PopulateExhibitionTicketPricingJob::dispatch($newExhibition, $ticketTypes);
 
         return $newExhibition;
     }

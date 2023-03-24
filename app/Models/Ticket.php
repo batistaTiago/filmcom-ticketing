@@ -19,4 +19,24 @@ class Ticket extends Model
         'theater_room_seat_id',
         'cart_id'
     ];
+
+    public function cart()
+    {
+        return $this->belongsTo(Cart::class);
+    }
+
+    public function exhibition()
+    {
+        return $this->belongsTo(Exhibition::class, 'exhibition_id', 'uuid');
+    }
+
+    public function type()
+    {
+        return $this->hasOne(TicketType::class, 'uuid', 'ticket_type_id');
+    }
+
+    public function seat()
+    {
+        return $this->belongsTo(TheaterRoomSeat::class, 'theater_room_seat_id', 'uuid');
+    }
 }
