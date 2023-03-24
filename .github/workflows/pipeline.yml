@@ -26,13 +26,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, pdo_mysql, gd, redis, openswoole, xdebug
+          extensions: mbstring, pdo_mysql, xdebug
           coverage: pcov
 
       - name: Install dependencies
@@ -53,7 +53,7 @@ jobs:
           DB_PASSWORD: root
           REDIS_HOST: 127.0.0.1
           REDIS_PORT: 6379
-        run: php artisan test tests/Feature
+        run: php artisan test
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2

@@ -7,6 +7,7 @@ use App\Domain\DTO\TheaterRoom\TheaterRoomSeatStatusDTO;
 use App\Domain\DTO\TheaterRoom\TheaterRoomSeatTypeDTO;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 class TheaterRoomSeat extends Model
 {
@@ -56,7 +57,7 @@ class TheaterRoomSeat extends Model
         $data = $this->toArray();
 
         $status = isset($data['exhibition_seats'][0]['seat_status']['name']) ?
-            new TheaterRoomSeatStatusDTO($data['exhibition_seats'][0]['seat_status']['name']) :
+            TheaterRoomSeatStatusDTO::fromArray($data['exhibition_seats'][0]['seat_status']) :
             null;
 
         return new TheaterRoomSeatDTO(

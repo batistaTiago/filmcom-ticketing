@@ -120,6 +120,8 @@ class AddTicketToCartTest extends TestCase
     /** @test */
     public function should_change_the_availability_of_the_exhibition_seat_to_reserved_on_ticket_creation()
     {
+        $this->withoutExceptionHandling();
+
         $this->populateExhibitionTicketTypes();
         $this->populateExhibitionSeats();
 
