@@ -10,15 +10,19 @@ use App\UseCases\CreateExhibitionUseCase;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class CreateExhibitionCommand extends Command
 {
     protected $signature = 'create:exhibition';
     protected $description = 'Command description';
 
+    public const WARNING_MSG = 'This command is not suitable for production. Are you sure you want to continue?';
+
     public function handle(CreateExhibitionUseCase $useCase)
     {
-        if (!$this->confirm('This command is not suitable for production. Are you sure you want to continue?')) {
+        if ((strtolower(config('app.env')) === 'production') && (!$this->confirm(self::WARNING_MSG))) {
             return Command::INVALID;
         }
 
@@ -38,6 +42,19 @@ class CreateExhibitionCommand extends Command
 
         // TODO validate startsAt variable
         $startsAt = $this->ask('Whats the time of the exhibition?');
+
+        $validator = validator(['starts_at' => $startsAt], [
+            'starts_at' => [
+                'required',
+                'string',
+                'date_format:H:i'
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            $this->error('Invalid time format. Please use H:i (i.e. 08:30) format.');
+            return Command::INVALID;
+        }
 
         $dayOfWeek = array_flip(Carbon::getDays())[$this->choice('Which day of the week is it?', Carbon::getDays())];
 
@@ -69,7 +86,8 @@ class CreateExhibitionCommand extends Command
         }
 
         $exhibition = $useCase->execute($exhibitionData, $ticketTypesToAddData);
-
         $this->info("Exhibition created: $exhibition->uuid");
+
+        return Command::SUCCESS;
     }
 }

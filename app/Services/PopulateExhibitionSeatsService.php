@@ -57,6 +57,7 @@ class PopulateExhibitionSeatsService
             }
         }
 
+
         return $insertData;
     }
 }
