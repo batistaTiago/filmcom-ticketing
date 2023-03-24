@@ -2,7 +2,6 @@
 
 namespace App\Domain\DTO\Cart;
 
-use App\Domain\DTO\CartStatusDTO;
 use App\Domain\DTO\TicketDTO;
 use App\Domain\DTO\UserDTO;
 use InvalidArgumentException;
@@ -16,9 +15,13 @@ class CartDTO
         public array $tickets = [],
     )
     {
+        if (empty($uuid)) {
+            throw new InvalidArgumentException('Uuid must not be empty');
+        }
+
         foreach ($this->tickets as $ticket) {
-            if ($ticket instanceof TicketDTO) {
-                throw new InvalidArgumentException();
+            if (!($ticket instanceof TicketDTO)) {
+                throw new InvalidArgumentException('Tickets must be an array of TicketDTOs');
             }
         }
     }

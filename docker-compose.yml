@@ -21,7 +21,7 @@ services:
             - redis
         environment:
             DB_HOST: mysql
-            REDIS_HOST: mysql
+            REDIS_HOST: redis
         restart: always
 
     api:
@@ -35,6 +35,8 @@ services:
         extends:
             service: filmcom
         command: php artisan horizon
+        environment:
+            LOG_CHANNEL: stderr
 
     mysql:
         image: mysql:5.7.22

@@ -3,16 +3,17 @@
 namespace App\Models;
 
 use App\Domain\DTO\ExhibitionDTO;
+use App\Models\Traits\BaseModel;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Exhibition extends Model
 {
-    use HasFactory;
+    use BaseModel;
 
     public $primaryKey = 'uuid';
     public $incrementing = false;
+
     public $fillable = ExhibitionDTO::ATTRIBUTES;
 
     public function film()

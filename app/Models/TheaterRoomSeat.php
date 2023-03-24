@@ -5,16 +5,17 @@ namespace App\Models;
 use App\Domain\DTO\TheaterRoom\TheaterRoomSeatDTO;
 use App\Domain\DTO\TheaterRoom\TheaterRoomSeatStatusDTO;
 use App\Domain\DTO\TheaterRoom\TheaterRoomSeatTypeDTO;
+use App\Models\Traits\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
 
 class TheaterRoomSeat extends Model
 {
-    use HasFactory;
+    use BaseModel;
 
     public $primaryKey = 'uuid';
     public $incrementing = false;
+
     public $hidden = ['pivot'];
 
     public $fillable = [

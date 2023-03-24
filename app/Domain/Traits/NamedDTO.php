@@ -10,7 +10,7 @@ trait NamedDTO
 
     public function __construct(public readonly string $uuid, public string $name) {
         if (empty($uuid)) {
-            throw new InvalidArgumentException('Name should not be empty');
+            throw new InvalidArgumentException('Uuid should not be empty');
         }
 
         if (empty($name)) {

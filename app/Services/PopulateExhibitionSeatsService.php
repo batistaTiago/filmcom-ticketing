@@ -51,6 +51,8 @@ class PopulateExhibitionSeatsService
                     'exhibition_id' => $exhibition->uuid,
                     'theater_room_seat_id' => $seat->uuid,
                     'seat_status_id' => $defaultSeatStatus->uuid,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ];
             }
         }

@@ -2,15 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Traits\BaseModel;
 use Illuminate\Database\Eloquent\Model;
 
 class Cart extends Model
 {
-    use HasFactory;
-
-    public $primaryKey = 'uuid';
-    public $incrementing = false;
+    use BaseModel;
 
     public $fillable = [
         'uuid',

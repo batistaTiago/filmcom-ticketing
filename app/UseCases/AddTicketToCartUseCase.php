@@ -2,6 +2,7 @@
 
 namespace App\UseCases;
 
+use App\Domain\Services\ComputeCartStateService;
 use App\Models\Cart;
 use App\Models\CartStatus;
 use App\Models\ExhibitionSeat;
@@ -16,7 +17,8 @@ class AddTicketToCartUseCase
 {
     public function __construct(
         private readonly TicketAvailabilityService $ticketAvailabilityService,
-        private readonly AuthManager $auth
+        private readonly AuthManager $auth,
+        private readonly ComputeCartStateService $computeCartStateService
     ) { }
 
     public function execute(array $data)

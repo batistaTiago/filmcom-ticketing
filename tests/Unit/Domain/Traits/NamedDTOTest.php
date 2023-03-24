@@ -11,9 +11,10 @@ class Subject { use NamedDTO; }
 class NamedDTOTest extends TestCase
 {
     /**
+     * @test
      * @dataProvider provideValidData
      */
-    public function testFromArray(array $data)
+    public function should_initiate_both_fields(array $data)
     {
         $namedDTO = Subject::fromArray($data);
 
@@ -22,9 +23,10 @@ class NamedDTOTest extends TestCase
     }
 
     /**
+     * @test
      * @dataProvider provideInvalidData
      */
-    public function testFromArrayThrowsException(array $data)
+    public function should_throw_an_exception_if_the_data_is_invalid(array $data)
     {
         $this->expectException(Throwable::class);
 

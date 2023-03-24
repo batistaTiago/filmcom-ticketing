@@ -3,6 +3,7 @@
 namespace App\Domain\DTO;
 
 use Carbon\Carbon;
+use InvalidArgumentException;
 
 class UserDTO
 {
@@ -13,6 +14,15 @@ class UserDTO
     public string $password;
     public string $remember_token;
 
+    public const ATTRIBUTES = [
+        'uuid',
+        'name',
+        'email',
+        'email_verified_at',
+        'password',
+        'remember_token',
+    ];
+
     public function __construct(
         string $uuid,
         string $name,
@@ -22,8 +32,12 @@ class UserDTO
         string $remember_token
     )
     {
+        if (empty($uuid)) {
+            throw new InvalidArgumentException('Name must not be empty');
+        }
+
         if (empty($name)) {
-            throw new \InvalidArgumentException('Name must not be empty');
+            throw new InvalidArgumentException('Name must not be empty');
         }
 
         $this->uuid = $uuid;
@@ -36,6 +50,6 @@ class UserDTO
 
     public static function fromArray(array $data): static
     {
-        return new static(...$data);
+        return new static(...array_intersect_key($data, array_flip(self::ATTRIBUTES)));
     }
 }
