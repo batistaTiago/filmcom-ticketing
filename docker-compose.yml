@@ -29,7 +29,7 @@ services:
             service: filmcom
         ports:
             - "9098:9000"
-        command: php artisan serve --host=0.0.0.0 --port=9000
+        command: php artisan octane:start --host=0.0.0.0 --port=9000 --server=swoole
 
     worker:
         extends:
@@ -62,3 +62,46 @@ services:
         volumes:
             - redis_data:/data
 
+    locust_base:
+        build:
+            context: ./locust
+        environment:
+            FILE_NAME: film_picking/film_scrolling_simulation_load_test.py
+        working_dir: /mnt/locust
+        restart: always
+        networks:
+            - filmcom-ticketing-network
+        volumes:
+            - ./locust:/mnt/locust
+
+    locust_master:
+        extends:
+            service: locust_base
+        ports:
+            - "8089:8089"
+        command:
+            - -f
+            - /mnt/locust/locustfile.py
+            - --master
+            - --host=http://api:9000
+            - --users=100
+            - --spawn-rate=1
+
+    locust_worker:
+        extends:
+            service: locust_base
+        depends_on:
+            - locust_master
+        deploy:
+            replicas: 4
+        command: -f /mnt/locust/locustfile.py --worker --master-host locust_master
+
+#    locust_worker_picking:
+#        extends:
+#            service: locust_worker
+#        command: -f /mnt/locust/film_picking/film_scrolling_simulation_load_test.py --worker --master-host locust_master
+#
+#    locust_worker_creating:
+#        extends:
+#            service: locust_worker
+#        command: -f /mnt/locust/film_creation/film_creation_load_test.py --worker --master-host locust_master
