@@ -2,15 +2,9 @@
 
 namespace App\Domain\DTO;
 
-use InvalidArgumentException;
+use App\Domain\Traits\NamedDTO;
 
 class TicketTypeDTO
 {
-    // TODO use NamedDTO
-    public function __construct(public string $name)
-    {
-        if (empty($name)) {
-            throw new InvalidArgumentException('Name should not be empty');
-        }
-    }
+    use NamedDTO;
 }

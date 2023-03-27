@@ -97,6 +97,26 @@ class AddTicketToCartTest extends TestCase
     }
 
     /** @test */
+    public function should_return_the_tickets_along_with_the_cart_info()
+    {
+        $this->populateExhibitionTicketTypes();
+        $this->populateExhibitionSeats();
+
+        $this->actingAs($this->user)->postJson(route('api.tickets.add-to-cart'), [
+            'exhibition_id' => $this->exhibition->uuid,
+            'ticket_type_id' => $this->ticketType->uuid,
+            'theater_room_seat_id' => $this->seat->uuid,
+        ])->assertJsonStructure([
+            'cart_state' => [
+                'uuid',
+                'status',
+                'user',
+                'tickets',
+            ]
+        ]);
+    }
+
+    /** @test */
     public function should_create_a_cart_if_the_provided_cart_id_is_not_active()
     {
         $this->populateExhibitionTicketTypes();

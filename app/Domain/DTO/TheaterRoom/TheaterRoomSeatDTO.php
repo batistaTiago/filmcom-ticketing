@@ -11,6 +11,13 @@ class TheaterRoomSeatDTO
     public TheaterRoomSeatTypeDTO $type;
     public ?TheaterRoomSeatStatusDTO $status;
 
+    public const ATTRIBUTES = [
+        'uuid',
+        'name',
+        'type',
+        'status',
+    ];
+
     public function __construct(
         string $uuid,
         string $name,
@@ -29,5 +36,10 @@ class TheaterRoomSeatDTO
         $this->name = $name;
         $this->type = $type;
         $this->status = $status;
+    }
+
+    public static function fromArray(array $data): static
+    {
+        return new static(...array_intersect_key($data, array_flip(self::ATTRIBUTES)));
     }
 }

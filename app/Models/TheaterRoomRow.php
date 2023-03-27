@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Domain\DTO\TheaterRoom\TheaterRoomRowDTO;
+use App\Models\Traits\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 class TheaterRoomRow extends Model
 {
-    use HasFactory;
+    use BaseModel;
 
     public $primaryKey = 'uuid';
     public $incrementing = false;

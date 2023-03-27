@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Traits\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SeatStatus extends Model
 {
-    use HasFactory;
+    use BaseModel;
 
     public $primaryKey = 'uuid';
     public $incrementing = false;
+
     public $hidden = ['pivot'];
 
     public const AVAILABLE = 'available';

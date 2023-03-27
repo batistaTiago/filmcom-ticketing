@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Domain\DTO\TicketTypeDTO;
+use App\Models\Traits\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TicketType extends Model
 {
-    use HasFactory;
+    use BaseModel;
 
     public $primaryKey = 'uuid';
     public $incrementing = false;
@@ -19,6 +20,6 @@ class TicketType extends Model
 
     public function toDto(): TicketTypeDTO
     {
-        return new TicketTypeDTO($this->name);
+        return TicketTypeDTO::fromArray($this->toArray());
     }
 }

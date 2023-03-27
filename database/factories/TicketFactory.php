@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Cart;
 use App\Models\Exhibition;
 use App\Models\TheaterRoomSeat;
 use App\Models\TicketType;
@@ -17,6 +18,7 @@ class TicketFactory extends Factory
             'exhibition_id' => Exhibition::factory(),
             'theater_room_seat_id' => TheaterRoomSeat::factory(),
             'ticket_type_id' => TicketType::factory(),
+            'cart_id' => Cart::factory(),
         ];
     }
 }

@@ -11,7 +11,7 @@ class CartStatusFactory extends Factory
     {
         return [
             'uuid' => Str::orderedUuid()->toString(),
-            'name' => fake()->word,
+            'name' => Str::orderedUuid()->toString(),
         ];
     }
 }

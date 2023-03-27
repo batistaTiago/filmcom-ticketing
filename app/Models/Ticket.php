@@ -2,12 +2,20 @@
 
 namespace App\Models;
 
+use App\Domain\DTO\ExhibitionDTO;
+use App\Domain\DTO\ExhibitionTicketTypeDTO;
+use App\Domain\DTO\TheaterRoom\TheaterRoomSeatDTO;
+use App\Domain\DTO\TheaterRoom\TheaterRoomSeatStatusDTO;
+use App\Domain\DTO\TheaterRoom\TheaterRoomSeatTypeDTO;
+use App\Domain\DTO\TicketDTO;
+use App\Domain\DTO\TicketTypeDTO;
+use App\Models\Traits\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Ticket extends Model
 {
-    use HasFactory;
+    use BaseModel;
 
     public $primaryKey = 'uuid';
     public $incrementing = false;
@@ -38,5 +46,32 @@ class Ticket extends Model
     public function seat()
     {
         return $this->belongsTo(TheaterRoomSeat::class, 'theater_room_seat_id', 'uuid');
+    }
+
+    public function exhibition_ticket_types()
+    {
+        return $this->hasMany(
+            ExhibitionTicketType::class,
+            'ticket_type_id',
+            'ticket_type_id'
+        );
+    }
+
+    public function toDto(): TicketDTO
+    {
+        $data = $this->toArray();
+
+        return new TicketDTO(
+            $data['uuid'],
+            new TheaterRoomSeatDTO(
+                uuid: $data['seat']['uuid'],
+                name: $data['seat']['name'],
+                type: TheaterRoomSeatTypeDTO::fromArray($data['seat']['type']),
+                status: TheaterRoomSeatStatusDTO::fromArray($data['seat']['exhibition_seat']['seat_status']),
+            ),
+            ExhibitionDTO::fromArray($data['exhibition']),
+            TicketTypeDTO::fromArray($data['type']),
+            ExhibitionTicketTypeDTO::fromArray($data['exhibition_ticket_type']),
+        );
     }
 }

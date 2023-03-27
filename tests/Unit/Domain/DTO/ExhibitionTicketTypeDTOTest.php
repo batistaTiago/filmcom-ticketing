@@ -1,6 +1,6 @@
 <?php
 
-namespace Domain\DTO;
+namespace Tests\Unit\Domain\DTO;
 
 use App\Domain\DTO\ExhibitionTicketTypeDTO;
 use InvalidArgumentException;

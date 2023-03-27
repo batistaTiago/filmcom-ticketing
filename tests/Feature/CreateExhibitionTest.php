@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Jobs\CreateExhibitionSeatAvailabilityJob;
 use App\Jobs\PopulateExhibitionTicketPricingJob;
 use App\Models\Exhibition;
-use App\Models\ExhibitionTicketType;
 use App\Models\Film;
 use App\Models\SeatStatus;
 use App\Models\SeatType;
@@ -16,7 +15,6 @@ use App\Models\TicketType;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -34,8 +32,6 @@ class CreateExhibitionTest extends TestCase
      */
     public function should_be_able_to_create_an_exhibition_of_a_film_in_a_theater_room($sampleData)
     {
-        Bus::fake();
-
         Film::factory()->create(['uuid' => $sampleData['exhibition']['film_id']]);
         TheaterRoom::factory()->create(['uuid' => $sampleData['exhibition']['theater_room_id']]);
 

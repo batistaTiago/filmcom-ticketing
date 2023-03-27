@@ -45,6 +45,8 @@ class PopulateExhibitionTicketPricingService
                 'exhibition_id' => $exhibition->uuid,
                 'ticket_type_id' => $ticketType['uuid'],
                 'price' => $ticketType['price'],
+                'updated_at' => now(),
+            'created_at' => now(),
             ];
         }, $ticketTypes);
     }

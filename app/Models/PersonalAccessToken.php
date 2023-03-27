@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Traits\BaseModel;
 use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
 
 class PersonalAccessToken extends SanctumPersonalAccessToken
 {
+    use BaseModel;
+
     public $primaryKey = 'uuid';
     public $incrementing = false;
 

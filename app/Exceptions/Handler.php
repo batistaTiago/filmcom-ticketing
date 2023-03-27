@@ -54,10 +54,15 @@ class Handler extends ExceptionHandler
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
 
-        $httpStatus = ($e->getCode() !== 0) ? $e->getCode() : 400;
         if ($e instanceof DomainException) {
+            $trace = $e->getTrace();
+            $httpStatus = ($e->getCode() !== 0) ? $e->getCode() : 400;
+
+            $appTrace = array_filter($trace, fn ($item) => !strpos($item['file'], 'vendor'));
+
             return response()->json([
                 'error' => $e->getMessage(),
+                'app_trace' => config('app.debug') ? $appTrace : null,
                 'trace' => config('app.debug') ? $e->getTrace() : null
             ], $httpStatus);
         }
