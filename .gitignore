@@ -18,3 +18,5 @@ yarn-error.log
 /.idea
 /.vscode
 tests/coverage_report
+locust/__pycache__
+__pycache__/
