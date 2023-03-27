@@ -120,7 +120,7 @@ class AddTicketToCartTest extends TestCase
     }
 
     /** @test */
-    public function should_create_a_cart_if_the_provided_cart_id_is_not_active()
+    public function should_create_a_new_cart_if_the_provided_cart_id_is_not_active()
     {
         $this->populateExhibitionTicketTypes();
         $this->populateExhibitionSeats();

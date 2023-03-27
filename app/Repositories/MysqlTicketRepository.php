@@ -2,13 +2,16 @@
 
 namespace App\Repositories;
 
+use App\Domain\DTO\Cart\CartDTO;
 use App\Domain\Repositories\TicketRepositoryInterface;
 use App\Exceptions\ResourceNotFoundException;
 use App\Models\ExhibitionSeat;
 use App\Models\SeatStatus;
 use App\Models\Ticket;
+use DomainException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class MysqlTicketRepository implements TicketRepositoryInterface
 {
@@ -56,5 +59,31 @@ class MysqlTicketRepository implements TicketRepositoryInterface
         ]);
 
         $ticket->delete();
+    }
+
+    public function addToCart(
+        string $cart_id,
+        string $exhibition_id,
+        string $theater_room_seat_id,
+        string $ticket_type_id,
+    ): void
+    {
+        $ticket = Ticket::query()->firstWhere(compact('exhibition_id', 'theater_room_seat_id'));
+
+        if ($ticket) {
+            throw new DomainException('This seat has already been taken. Please try a different one.');
+        }
+
+        $uuid = Str::orderedUuid()->toString();
+
+        Ticket::query()->create(
+            compact(
+                'uuid',
+                'exhibition_id',
+                'theater_room_seat_id',
+                'ticket_type_id',
+                'cart_id'
+            )
+        );
     }
 }

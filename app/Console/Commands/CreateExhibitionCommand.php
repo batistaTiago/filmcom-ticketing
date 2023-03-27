@@ -40,7 +40,6 @@ class CreateExhibitionCommand extends Command
 
         $room = $rooms->where('name', $roomName)->first();
 
-        // TODO validate startsAt variable
         $startsAt = $this->ask('Whats the time of the exhibition?');
 
         $validator = validator(['starts_at' => $startsAt], [
