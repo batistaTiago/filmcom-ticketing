@@ -58,7 +58,9 @@ class Handler extends ExceptionHandler
             $trace = $e->getTrace();
             $httpStatus = ($e->getCode() !== 0) ? $e->getCode() : 400;
 
-            $appTrace = array_filter($trace, fn ($item) => !strpos($item['file'], 'vendor'));
+            $appTrace = array_filter($trace, function ($item) {
+                return !array_key_exists('file', $item) || !strpos(($item['file']), 'vendor');
+            });
 
             return response()->json([
                 'error' => $e->getMessage(),

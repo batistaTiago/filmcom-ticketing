@@ -10,6 +10,7 @@ class LoginTest extends TestCase
     /** @test */
     public function should_return_a_token_along_with_its_expiration_date()
     {
+        $this->withoutExceptionHandling();
         $user = User::factory()->create();
         $this->postJson(route('auth.login'), [
             'email' => $user->email,

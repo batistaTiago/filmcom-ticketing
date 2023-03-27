@@ -4,8 +4,9 @@ namespace App\Domain\DTO;
 
 use Carbon\Carbon;
 use InvalidArgumentException;
+use JsonSerializable;
 
-class UserDTO
+class UserDTO implements JsonSerializable
 {
     public readonly string $uuid;
     public string $name;
@@ -51,5 +52,12 @@ class UserDTO
     public static function fromArray(array $data): static
     {
         return new static(...array_intersect_key($data, array_flip(self::ATTRIBUTES)));
+    }
+
+    public function jsonSerialize(): array
+    {
+        $data = (array) $this;
+        unset($data['password']);
+        return $data;
     }
 }

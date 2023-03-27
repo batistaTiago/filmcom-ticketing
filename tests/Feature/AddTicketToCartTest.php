@@ -36,13 +36,13 @@ class AddTicketToCartTest extends TestCase
     /** @test */
     public function should_not_allow_non_logged_users_to_add_tickets_to_a_cart()
     {
-        $this->postJson(route('api.tickets.add-to-cart'))->assertUnauthorized();
+        $this->postJson(route('api.cart.add-ticket'))->assertUnauthorized();
     }
 
     /** @test */
     public function should_validate_the_existence_of_exhibition_seat_and_ticket_type_ids()
     {
-        $this->actingAs($this->user)->postJson(route('api.tickets.add-to-cart'), [
+        $this->actingAs($this->user)->postJson(route('api.cart.add-ticket'), [
             'exhibition_id' => fake()->uuid,
             'ticket_type_id' => fake()->uuid,
             'theater_room_seat_id' => fake()->uuid,
@@ -54,7 +54,7 @@ class AddTicketToCartTest extends TestCase
     {
         $this->populateExhibitionSeats();
 
-        $this->actingAs($this->user)->postJson(route('api.tickets.add-to-cart'), [
+        $this->actingAs($this->user)->postJson(route('api.cart.add-ticket'), [
             'exhibition_id' => $this->exhibition->uuid,
             'ticket_type_id' => $this->ticketType->uuid,
             'theater_room_seat_id' => $this->seat->uuid,
@@ -72,7 +72,7 @@ class AddTicketToCartTest extends TestCase
             'seat_status_id' => $this->unavailableSeatStatus->uuid,
         ]);
 
-        $this->actingAs($this->user)->postJson(route('api.tickets.add-to-cart'), [
+        $this->actingAs($this->user)->postJson(route('api.cart.add-ticket'), [
             'exhibition_id' => $this->exhibition->uuid,
             'ticket_type_id' => $this->ticketType->uuid,
             'theater_room_seat_id' => $this->seat->uuid,
@@ -82,10 +82,11 @@ class AddTicketToCartTest extends TestCase
     /** @test */
     public function should_create_a_cart_for_the_logged_user_if_no_cart_id_is_provided()
     {
+        $this->withoutExceptionHandling();
         $this->populateExhibitionTicketTypes();
         $this->populateExhibitionSeats();
 
-        $this->actingAs($this->user)->postJson(route('api.tickets.add-to-cart'), [
+        $this->actingAs($this->user)->postJson(route('api.cart.add-ticket'), [
             'exhibition_id' => $this->exhibition->uuid,
             'ticket_type_id' => $this->ticketType->uuid,
             'theater_room_seat_id' => $this->seat->uuid,
@@ -102,7 +103,7 @@ class AddTicketToCartTest extends TestCase
         $this->populateExhibitionTicketTypes();
         $this->populateExhibitionSeats();
 
-        $this->actingAs($this->user)->postJson(route('api.tickets.add-to-cart'), [
+        $res = $this->actingAs($this->user)->postJson(route('api.cart.add-ticket'), [
             'exhibition_id' => $this->exhibition->uuid,
             'ticket_type_id' => $this->ticketType->uuid,
             'theater_room_seat_id' => $this->seat->uuid,
@@ -113,11 +114,13 @@ class AddTicketToCartTest extends TestCase
                 'user',
                 'tickets',
             ]
-        ]);
+        ])->decodeResponseJson();
+
+        $this->assertArrayNotHasKey('password', $res['cart_state']['user']);
     }
 
     /** @test */
-    public function should_create_a_cart_if_the_provided_cart_id_is_not_active()
+    public function should_create_a_new_cart_if_the_provided_cart_id_is_not_active()
     {
         $this->populateExhibitionTicketTypes();
         $this->populateExhibitionSeats();
@@ -127,7 +130,7 @@ class AddTicketToCartTest extends TestCase
             'cart_status_id' => $this->expiredCartStatus->uuid
         ]);
 
-        $this->actingAs($this->user)->postJson(route('api.tickets.add-to-cart'), [
+        $this->actingAs($this->user)->postJson(route('api.cart.add-ticket'), [
             'exhibition_id' => $this->exhibition->uuid,
             'ticket_type_id' => $this->ticketType->uuid,
             'theater_room_seat_id' => $this->seat->uuid,
@@ -150,7 +153,7 @@ class AddTicketToCartTest extends TestCase
             'cart_status_id' => $this->expiredCartStatus->uuid
         ]);
 
-        $this->actingAs($this->user)->postJson(route('api.tickets.add-to-cart'), [
+        $this->actingAs($this->user)->postJson(route('api.cart.add-ticket'), [
             'exhibition_id' => $this->exhibition->uuid,
             'ticket_type_id' => $this->ticketType->uuid,
             'theater_room_seat_id' => $this->seat->uuid,

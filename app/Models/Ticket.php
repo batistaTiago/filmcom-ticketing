@@ -63,6 +63,7 @@ class Ticket extends Model
 
         return new TicketDTO(
             $data['uuid'],
+            $data['cart_id'],
             new TheaterRoomSeatDTO(
                 uuid: $data['seat']['uuid'],
                 name: $data['seat']['name'],

@@ -10,7 +10,6 @@ use App\Models\TheaterRoom;
 
 class MysqlTheaterRoomRepository implements TheaterRoomRepositoryInterface
 {
-    // TODO: segundo parametro (ou decorator) para customizar o throw do error retornando null
     public function findRoomById(string $uuid): TheaterRoomDTO
     {
         $entry = TheaterRoom::query()->with('rows.seats.type')->where(compact('uuid'))->first();

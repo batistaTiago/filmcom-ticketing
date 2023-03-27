@@ -5,7 +5,7 @@ use App\Http\Controllers\FilmController;
 use App\Http\Controllers\SeatMapImportController;
 use App\Http\Controllers\TheaterRoomController;
 use App\Http\Controllers\TheaterController;
-use App\Http\Controllers\TicketController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\TicketTypeController;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +49,7 @@ Route::prefix('seat-map')->group(function () {
 
 Route::prefix('cart')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
-        Route::post('add-ticket', [TicketController::class, 'addToCart'])->name('api.tickets.add-to-cart');
+        Route::post('add-ticket', [CartController::class, 'addTicket'])->name('api.cart.add-ticket');
+        Route::post('remove-ticket', [CartController::class, 'removeTicket'])->name('api.cart.remove-ticket');
     });
 });

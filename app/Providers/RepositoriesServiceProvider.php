@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
+use App\Domain\Repositories\CartRepositoryInterface;
 use App\Domain\Repositories\ExhibitionRepositoryInterface;
 use App\Domain\Repositories\ExhibitionSeatRepositoryInterface;
 use App\Domain\Repositories\ExhibitionTicketTypeRepositoryInterface;
@@ -12,6 +13,7 @@ use App\Domain\Repositories\TheaterRoomRepositoryInterface;
 use App\Domain\Repositories\TicketRepositoryInterface;
 use App\Domain\Repositories\TicketTypeRepositoryInterface;
 use App\Domain\Repositories\UserRepositoryInterface;
+use App\Repositories\MysqlCartRepository;
 use App\Repositories\MysqlExhibitionRepository;
 use App\Repositories\MysqlExhibitionSeatRepository;
 use App\Repositories\MysqlExhibitionTicketTypeRepository;
@@ -36,5 +38,6 @@ class RepositoriesServiceProvider extends ServiceProvider
         $this->app->bind(ExhibitionSeatRepositoryInterface::class, MysqlExhibitionSeatRepository::class);
         $this->app->bind(ExhibitionTicketTypeRepositoryInterface::class, MysqlExhibitionTicketTypeRepository::class);
         $this->app->bind(TicketRepositoryInterface::class, MysqlTicketRepository::class);
+        $this->app->bind(CartRepositoryInterface::class, MysqlCartRepository::class);
     }
 }
