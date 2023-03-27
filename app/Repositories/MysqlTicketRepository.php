@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Domain\DTO\Cart\CartDTO;
 use App\Domain\Repositories\TicketRepositoryInterface;
 use App\Exceptions\ResourceNotFoundException;
 use App\Models\ExhibitionSeat;
@@ -10,7 +9,6 @@ use App\Models\SeatStatus;
 use App\Models\Ticket;
 use DomainException;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class MysqlTicketRepository implements TicketRepositoryInterface
@@ -61,7 +59,7 @@ class MysqlTicketRepository implements TicketRepositoryInterface
         $ticket->delete();
     }
 
-    public function addToCart(
+    public function createTicketInCart(
         string $cart_id,
         string $exhibition_id,
         string $theater_room_seat_id,

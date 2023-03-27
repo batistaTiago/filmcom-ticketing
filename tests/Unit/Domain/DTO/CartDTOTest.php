@@ -36,16 +36,16 @@ class CartDTOTest extends TestCase
                 'cart-uuid',
                 $user,
                 new CartStatusDTO('status-uuid', 'Status Name'),
-                collect([new TicketDTO('ticket-uuid')])
+                collect([new TicketDTO('ticket-uuid', 'cart-uuid')])
             ],
             [
                 'cart-uuid',
                 $user,
                 new CartStatusDTO('status-uuid', 'Status Name'),
                 collect([
-                    new TicketDTO('ticket-uuid'),
-                    new TicketDTO('ticket-uuid'),
-                    new TicketDTO('ticket-uuid')
+                    new TicketDTO('ticket-uuid', 'cart-uuid'),
+                    new TicketDTO('ticket-uuid', 'cart-uuid'),
+                    new TicketDTO('ticket-uuid', 'cart-uuid')
                 ])
             ],
         ];
@@ -88,35 +88,35 @@ class CartDTOTest extends TestCase
                 'cart-uuid',
                 $user,
                 null,
-                collect([new TicketDTO('ticket-uuid'), 'invalid-ticket']),
+                collect([new TicketDTO('ticket-uuid', 'cart-uuid'), 'invalid-ticket']),
                 InvalidArgumentException::class
             ],
             [
                 'cart-uuid',
                 $user,
                 null,
-                collect([new TicketDTO('ticket-uuid'), new stdClass()]),
+                collect([new TicketDTO('ticket-uuid', 'cart-uuid'), new stdClass()]),
                 InvalidArgumentException::class
             ],
             [
                 'cart-uuid',
                 $user,
                 null,
-                collect([new TicketDTO('ticket-uuid'), []]),
+                collect([new TicketDTO('ticket-uuid', 'cart-uuid'), []]),
                 InvalidArgumentException::class
             ],
             [
                 'cart-uuid',
                 $user,
                 null,
-                collect([new TicketDTO('ticket-uuid'), null]),
+                collect([new TicketDTO('ticket-uuid', 'cart-uuid'), null]),
                 InvalidArgumentException::class
             ],
             [
                 'cart-uuid',
                 $user,
                 null,
-                new EloquentCollection([new TicketDTO('ticket-uuid'), null]),
+                new EloquentCollection([new TicketDTO('ticket-uuid', 'cart-uuid'), null]),
                 InvalidArgumentException::class
             ],
         ];
@@ -186,7 +186,10 @@ class CartDTOTest extends TestCase
             'remember-token'
         );
         $status = null;
-        $tickets = new EloquentCollection([new TicketDTO('1st ticket-uuid'), new TicketDTO('2nd ticket-uuid')]);
+        $tickets = new EloquentCollection([
+            new TicketDTO('1st ticket-uuid', 'cart-uuid'),
+            new TicketDTO('2nd ticket-uuid', 'cart-uuid')
+        ]);
 
         $cartDTO = new CartDTO($uuid, $user, $status, $tickets);
 
