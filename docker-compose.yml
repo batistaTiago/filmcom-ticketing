@@ -11,7 +11,10 @@ volumes:
 
 services:
     filmcom:
-        build: .
+        build:
+            context: .
+            args:
+                INSTALL_XDEBUG: "${INSTALL_XDEBUG:-true}"
         networks:
             - filmcom-ticketing-network
         volumes:
@@ -97,13 +100,3 @@ services:
         deploy:
             replicas: 4
         command: -f /mnt/locust/locustfile.py --worker --master-host locust_master
-
-#    locust_worker_picking:
-#        extends:
-#            service: locust_worker
-#        command: -f /mnt/locust/film_picking/film_scrolling_simulation_load_test.py --worker --master-host locust_master
-#
-#    locust_worker_creating:
-#        extends:
-#            service: locust_worker
-#        command: -f /mnt/locust/film_creation/film_creation_load_test.py --worker --master-host locust_master

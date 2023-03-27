@@ -1,6 +1,10 @@
 FROM ekyidag/base-laravel-php82:v2
 
-RUN pecl install xdebug && docker-php-ext-enable xdebug
+ARG INSTALL_XDEBUG=false
+
+RUN if [ ${INSTALL_XDEBUG} = "true" ]; then \
+        pecl install xdebug && docker-php-ext-enable xdebug; \
+    fi
 
 COPY . .
 
