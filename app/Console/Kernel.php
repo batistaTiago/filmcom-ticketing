@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+//        $schedule->exec("echo 'Hello, World!'")->everyMinute();
+         $schedule->command('create:user')->everyMinute();
     }
 
     /**

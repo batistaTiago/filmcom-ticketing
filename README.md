@@ -31,3 +31,10 @@ VERSION=v2 && \
     docker build . -t ekyidag/base-laravel-php82:$VERSION -f ./Dockerfile-base && \
     docker push ekyidag/base-laravel-php82:$VERSION
 ```
+
+### Building the App image
+```
+docker build . -t ekyidag/filmcom-ticketing -f ./Dockerfile
+```
+
+### Building the CRON Image
