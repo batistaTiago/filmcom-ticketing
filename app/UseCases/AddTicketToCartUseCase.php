@@ -2,6 +2,8 @@
 
 namespace App\UseCases;
 
+use App\Domain\DTO\Cart\CartDTO;
+use App\Domain\Repositories\TicketRepositoryInterface;
 use App\Domain\Services\ComputeCartStateService;
 use App\Models\Cart;
 use App\Models\CartStatus;
@@ -18,7 +20,7 @@ class AddTicketToCartUseCase
     public function __construct(
         private readonly TicketAvailabilityService $ticketAvailabilityService,
         private readonly AuthManager $auth,
-        private readonly ComputeCartStateService $computeCartStateService
+        private readonly TicketRepositoryInterface $ticketRepository
     ) { }
 
     public function execute(array $data)
@@ -30,12 +32,12 @@ class AddTicketToCartUseCase
         );
 
         // TODO layerize this code
-        $cart = $this->getOrCreateCart($this->auth->user()->uuid, $data['cart_id'] ?? null);
-        $ticket = $this->createTicketInCart(
+        $cart = $this->getOrCreateCart($this->auth->user()->uuid, $data['cart_id'] ?? null)->toDto();
+        $this->createTicketInCart(
+            $cart,
             $data['exhibition_id'],
             $data['theater_room_seat_id'],
             $data['ticket_type_id'],
-            $cart->uuid
         );
 
         ExhibitionSeat::query()->where([
@@ -45,8 +47,12 @@ class AddTicketToCartUseCase
             'seat_status_id' => SeatStatus::query()->firstWhere(['name' => SeatStatus::RESERVED])->uuid
         ]);
 
+
         return response()->json([
-            'ticket' => $ticket->uuid
+            'cart_state' => array_merge(
+                (array) $cart,
+                (array) $this->ticketRepository->findTicketsInCart($cart->uuid)
+            )
         ]);
     }
 
@@ -72,11 +78,12 @@ class AddTicketToCartUseCase
     }
 
     private function createTicketInCart(
+        CartDTO $cart,
         string $exhibition_id,
         string $theater_room_seat_id,
         string $ticket_type_id,
-        string $cart_id
     ) {
+        $cart_id = $cart->uuid;
         $ticket = Ticket::query()->firstWhere(compact('exhibition_id', 'theater_room_seat_id'));
 
         if ($ticket) {
@@ -85,7 +92,8 @@ class AddTicketToCartUseCase
 
         $uuid = Str::orderedUuid()->toString();
 
-        return Ticket::query()->create(
+//      TODO criar funcao $this->ticketRepository->addToCart();
+        Ticket::query()->create(
             compact(
                 'uuid',
                 'exhibition_id',

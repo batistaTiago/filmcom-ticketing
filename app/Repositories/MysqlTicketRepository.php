@@ -18,7 +18,6 @@ class MysqlTicketRepository implements TicketRepositoryInterface
             ->get();
 
         return $tickets->map(function (Ticket $ticket) {
-
             $ticket->exhibition_ticket_type = $ticket->exhibition_ticket_types
                 ->where('exhibition_id', $ticket->exhibition_id)
                 ->first();

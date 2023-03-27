@@ -30,8 +30,6 @@ class MysqlTicketRepositoryTest extends TestCase
             'cart_status_id' => $cartStatus->uuid
         ]);
 
-
-
         for ($i = 0; $i < $ticketCount; $i++) {
             $ticket = Ticket::factory()->create([
                 'cart_id' => $cart->uuid,
@@ -70,7 +68,6 @@ class MysqlTicketRepositoryTest extends TestCase
             $this->assertEquals($ticketType->name, $ticketInCart->type->name);
             $this->assertEquals($ticketPrice, $ticketInCart->ticketTypeExhibitionInfo->price);
         }
-
     }
 
     /**
@@ -85,7 +82,7 @@ class MysqlTicketRepositoryTest extends TestCase
 
     public static function validTicketsInCartDataProvider()
     {
-        return [
+    return [
             [
                 TicketType::REGULAR,
                 9990,
