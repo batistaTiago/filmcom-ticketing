@@ -4,12 +4,12 @@ namespace App\UseCases;
 
 use App\Domain\DTO\Cart\CartDTO;
 use App\Domain\Repositories\TicketRepositoryInterface;
-use App\Domain\Services\ComputeCartStateService;
 use App\Models\Cart;
 use App\Models\CartStatus;
 use App\Models\ExhibitionSeat;
 use App\Models\SeatStatus;
 use App\Models\Ticket;
+use App\Services\ComputeCartStateService;
 use App\Services\TicketAvailabilityService;
 use DomainException;
 use Illuminate\Auth\AuthManager;
@@ -20,7 +20,8 @@ class AddTicketToCartUseCase
     public function __construct(
         private readonly TicketAvailabilityService $ticketAvailabilityService,
         private readonly AuthManager $auth,
-        private readonly TicketRepositoryInterface $ticketRepository
+        private readonly TicketRepositoryInterface $ticketRepository,
+        private readonly ComputeCartStateService $cartStateService,
     ) { }
 
     public function execute(array $data)
@@ -48,12 +49,7 @@ class AddTicketToCartUseCase
         ]);
 
 
-        return response()->json([
-            'cart_state' => array_merge(
-                (array) $cart,
-                (array) $this->ticketRepository->findTicketsInCart($cart->uuid)
-            )
-        ]);
+        return response()->json(['cart_state' => $this->cartStateService->execute($cart->uuid)]);
     }
 
     private function getOrCreateCart(string $userUuid, ?string $cartUuid = null): Cart
