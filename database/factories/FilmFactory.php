@@ -11,7 +11,7 @@ class FilmFactory extends Factory
     {
         return [
             'uuid' => Str::orderedUuid()->toString(),
-            'name' => strtolower(Str::random(24)),
+            'name' => fake()->catchPhrase,
             'year' => $this->faker->year,
             'duration' => $this->faker->numberBetween(90, 180)
         ];
