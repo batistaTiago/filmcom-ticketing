@@ -42,15 +42,6 @@ services:
         environment:
             LOG_CHANNEL: stderr
 
-    cron:
-        extends:
-            service: filmcom
-        build:
-            context: .
-            dockerfile: Dockerfile-cron
-        environment:
-            LOG_CHANNEL: stderr
-
     mysql:
         image: mysql:5.7.22
         restart: unless-stopped
