@@ -9,17 +9,16 @@ use App\Domain\Repositories\CartRepositoryInterface;
 use App\Domain\Repositories\TicketRepositoryInterface;
 use App\Services\ComputeCartStateService;
 use Illuminate\Support\Collection;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class ComputeCartStateServiceTest extends TestCase
 {
     /**
-     * @dataProvider executeDataProvider
+     * @test
+     * @dataProvider noPreloadedCartAndTicketsDataProvider
      */
-    public function testExecute(?CartDTO $cart, ?Collection $tickets, string $cart_uuid): void
+    public function should_call_its_repositories_if_nothing_is_preloaded(string $cart_uuid): void
     {
-
         $cartRepository = $this->createMock(CartRepositoryInterface::class);
         $ticketRepository = $this->createMock(TicketRepositoryInterface::class);
 
@@ -32,77 +31,57 @@ class ComputeCartStateServiceTest extends TestCase
             'remember-token'
         );
 
-        if ($cart === null) {
-            $cartRepository->expects($this->once())
-                ->method('getCart')
-                ->with($cart_uuid)
-                ->willReturn(new CartDTO('cart-uuid', $user));
-        } else {
-            $cartRepository->expects($this->never())->method('getCart');
-        }
+        $cartRepository->expects($this->once())
+            ->method('getCart')
+            ->with($cart_uuid)
+            ->willReturn(new CartDTO($cart_uuid, $user));
 
-        if ($tickets === null) {
-            $ticketRepository
-                ->expects($this->once())
-                ->method('findTicketsInCart')
-                ->with($cart_uuid)
-                ->willReturn(new Collection());
-        } else {
-            $ticketRepository->expects($this->never())->method('findTicketsInCart');
-        }
+        $ticketRepository
+            ->expects($this->once())
+            ->method('findTicketsInCart')
+            ->with($cart_uuid)
+            ->willReturn(new Collection());
 
         $service = new ComputeCartStateService($cartRepository, $ticketRepository);
-        if ($cart !== null) {
-            $service->setCart($cart);
-        }
-        if ($tickets !== null) {
-            $service->setTickets($tickets);
-        }
-
         $result = $service->execute($cart_uuid);
         $this->assertInstanceOf(CartDTO::class, $result);
     }
 
-    public static function executeDataProvider(): array
+    public static function noPreloadedCartAndTicketsDataProvider(): array
     {
-        $user = new UserDTO(
-            'user-uuid',
-            'John Doe',
-            'johndoe@example.com',
-            '2022-01-01 12:00:00',
-            'password',
-            'remember-token'
-        );
-        $cart = new CartDTO('cart-uuid', $user);
-        $ticket = new TicketDTO('ticket-uuid', 'cart-uuid');
-
         return [
-            [null, null, 'cart-uuid'],
-            [$cart, null, 'cart-uuid'],
-            [$cart, new Collection([$ticket]), 'cart-uuid'],
+            ['cart-uuid-1'],
+            ['cart-uuid-2'],
+            ['cart-uuid-3'],
         ];
     }
 
     /**
-     * @dataProvider setCartDataProvider
+     * @test
+     * @dataProvider preloadedCartDataProvider
      */
-    public function testSetCart(CartDTO $cart, ?Collection $tickets): void
+    public function should_call_only_the_ticket_repository_if_cart_is_preloaded(CartDTO $cart, string $cart_uuid): void
     {
-        $service = new ComputeCartStateService(
-            $this->createMock(CartRepositoryInterface::class),
-            $this->createMock(TicketRepositoryInterface::class)
-        );
+        $cartRepository = $this->createMock(CartRepositoryInterface::class);
+        $ticketRepository = $this->createMock(TicketRepositoryInterface::class);
 
-        if ($tickets !== null) {
-            $service->setTickets($tickets);
-        }
+        $cartRepository->expects($this->never())->method('getCart');
 
-        $this->expectException(InvalidArgumentException::class);
+        $ticketRepository
+            ->expects($this->once())
+            ->method('findTicketsInCart')
+            ->with($cart_uuid)
+            ->willReturn(new Collection());
+
+        $service = new ComputeCartStateService($cartRepository, $ticketRepository);
         $service->setCart($cart);
+        $result = $service->execute($cart_uuid);
+        $this->assertInstanceOf(CartDTO::class, $result);
     }
 
-    public static function setCartDataProvider(): array
+    public static function preloadedCartDataProvider(): array
     {
+        // Create different CartDTO instances for each dataset
         $user = new UserDTO(
             'user-uuid',
             'John Doe',
@@ -111,36 +90,63 @@ class ComputeCartStateServiceTest extends TestCase
             'password',
             'remember-token'
         );
-        $cart = new CartDTO('cart-uuid', $user);
-        $ticket = new TicketDTO('ticket-uuid', 'another-cart-uuid');
+        $cart1 = new CartDTO('cart-uuid-1', $user);
+        $cart2 = new CartDTO('cart-uuid-2', $user);
+        $cart3 = new CartDTO('cart-uuid-3', $user);
 
         return [
-            [$cart, new Collection([$ticket])],
+            [$cart1, 'cart-uuid-1'],
+            [$cart2, 'cart-uuid-2'],
+            [$cart3, 'cart-uuid-3'],
         ];
     }
 
     /**
-     * @dataProvider setTicketsDataProvider
+     * @test
+     * @dataProvider preloadedCartAndTicketsDataProvider
      */
-    public function testSetTickets(Collection $tickets): void
+    public function should_not_call_the_repositories_if_both_tickets_and_cart_are_preloaded(
+        CartDTO $cart,
+        Collection $tickets,
+        string $cart_uuid
+    ): void
     {
-        $service = new ComputeCartStateService(
-            $this->createMock(CartRepositoryInterface::class),
-            $this->createMock(TicketRepositoryInterface::class)
-        );
+        $cartRepository = $this->createMock(CartRepositoryInterface::class);
+        $ticketRepository = $this->createMock(TicketRepositoryInterface::class);
 
-        $this->expectException(InvalidArgumentException::class);
+        $cartRepository->expects($this->never())->method('getCart');
+        $ticketRepository->expects($this->never())->method('findTicketsInCart');
+
+        $service = new ComputeCartStateService($cartRepository, $ticketRepository);
+        $service->setCart($cart);
         $service->setTickets($tickets);
+        $result = $service->execute($cart_uuid);
+        $this->assertInstanceOf(CartDTO::class, $result);
     }
 
-    public static function setTicketsDataProvider(): array
+    public static function preloadedCartAndTicketsDataProvider(): array
     {
-        $ticket = new TicketDTO('ticket-uuid', 'cart-uuid');
-        $invalidTicket = new \stdClass();
+        // Create different CartDTO instances and corresponding TicketDTO collections for each dataset
+        $user = new UserDTO(
+            'user-uuid',
+            'John Doe',
+            'johndoe@example.com',
+            '2022-01-01 12:00:00',
+            'password',
+            'remember-token'
+        );
+        $cart1 = new CartDTO('cart-uuid-1', $user);
+        $cart2 = new CartDTO('cart-uuid-2', $user);
+        $cart3 = new CartDTO('cart-uuid-3', $user);
+
+        $ticket1 = new TicketDTO('ticket-uuid-1', 'cart-uuid-1');
+        $ticket2 = new TicketDTO('ticket-uuid-2', 'cart-uuid-2');
+        $ticket3 = new TicketDTO('ticket-uuid-3', 'cart-uuid-3');
 
         return [
-            [new Collection([$invalidTicket])],
-            [new Collection([$ticket, $invalidTicket])],
+            [$cart1, new Collection([$ticket1]), 'cart-uuid-1'],
+            [$cart2, new Collection([$ticket2]), 'cart-uuid-2'],
+            [$cart3, new Collection([$ticket3]), 'cart-uuid-3'],
         ];
     }
 }

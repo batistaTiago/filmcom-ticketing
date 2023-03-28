@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Domain\Repositories\TicketRepositoryInterface;
 use App\Exceptions\ResourceNotFoundException;
+use App\Models\Cart;
 use App\Models\ExhibitionSeat;
 use App\Models\SeatStatus;
 use App\Models\Ticket;
@@ -37,27 +38,6 @@ class MysqlTicketRepository implements TicketRepositoryInterface
         });
     }
 
-    public function removeTicketFromCart(string $cart_id, string $ticket_id)
-    {
-        $ticket = Ticket::query()->where('uuid', $ticket_id)->first();
-
-        if (empty($ticket)) {
-            throw new ResourceNotFoundException('Ticket not found');
-        }
-
-        if ($ticket->cart_id != $cart_id) {
-            throw new ResourceNotFoundException('Ticket does not belong to this cart');
-        }
-
-        ExhibitionSeat::query()->where([
-            'exhibition_id' => $ticket->exhibition_id,
-            'theater_room_seat_id' => $ticket->theater_room_seat_id,
-        ])->update([
-            'seat_status_id' => SeatStatus::query()->firstWhere(['name' => SeatStatus::AVAILABLE])->uuid
-        ]);
-
-        $ticket->delete();
-    }
 
     public function createTicketInCart(
         string $cart_id,
@@ -83,5 +63,31 @@ class MysqlTicketRepository implements TicketRepositoryInterface
                 'cart_id'
             )
         );
+
+        Cart::query()->update(['updated_at' => now()]);
+    }
+
+    public function removeTicketFromCart(string $cart_id, string $ticket_id)
+    {
+        $ticket = Ticket::query()->where('uuid', $ticket_id)->first();
+
+        if (empty($ticket)) {
+            throw new ResourceNotFoundException('Ticket not found');
+        }
+
+        if ($ticket->cart_id != $cart_id) {
+            throw new ResourceNotFoundException('Ticket does not belong to this cart');
+        }
+
+        ExhibitionSeat::query()->where([
+            'exhibition_id' => $ticket->exhibition_id,
+            'theater_room_seat_id' => $ticket->theater_room_seat_id,
+        ])->update([
+            'seat_status_id' => SeatStatus::query()->firstWhere(['name' => SeatStatus::AVAILABLE])->uuid
+        ]);
+
+        $ticket->delete();
+
+        Cart::query()->update(['updated_at' => now()]);
     }
 }

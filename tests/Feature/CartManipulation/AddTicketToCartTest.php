@@ -1,14 +1,17 @@
 <?php
 
+namespace CartManipulation;
+
+use App\Models\Cart;
+use App\Models\CartStatus;
 use App\Models\Exhibition;
 use App\Models\ExhibitionSeat;
 use App\Models\ExhibitionTicketType;
-use App\Models\Cart;
-use App\Models\CartStatus;
 use App\Models\SeatStatus;
 use App\Models\TheaterRoomSeat;
 use App\Models\TicketType;
 use App\Models\User;
+use Carbon\Carbon;
 use Tests\TestCase;
 
 class AddTicketToCartTest extends TestCase
@@ -16,6 +19,9 @@ class AddTicketToCartTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        $fakeTestNow = Carbon::create('2023', '03', '27', '23', '00');
+        Carbon::setTestNow($fakeTestNow);
 
         CartStatus::factory()->create(['name' => CartStatus::ACTIVE]);
         $this->expiredCartStatus = CartStatus::factory()->create(['name' => CartStatus::EXPIRED]);
@@ -97,6 +103,26 @@ class AddTicketToCartTest extends TestCase
     }
 
     /** @test */
+    public function should_propagate_the_update_to_the_cart()
+    {
+        $cart = Cart::factory()->create(['user_id' => $this->user->uuid]);
+
+        $fakeTestNow = Carbon::create('2023', '03', '28', '00', '00');
+        Carbon::setTestNow($fakeTestNow);
+        $this->populateExhibitionTicketTypes();
+        $this->populateExhibitionSeats();
+
+        $this->actingAs($this->user)->postJson(route('api.cart.add-ticket'), [
+            'exhibition_id' => $this->exhibition->uuid,
+            'ticket_type_id' => $this->ticketType->uuid,
+            'theater_room_seat_id' => $this->seat->uuid,
+            'cart_id' => $cart->uuid
+        ])->assertOk();
+
+        $this->assertEquals($fakeTestNow->toDateTimeString(), $cart->fresh()->updated_at->toDateTimeString());
+    }
+
+    /** @test */
     public function should_return_the_tickets_along_with_the_cart_info()
     {
         $this->populateExhibitionTicketTypes();
@@ -106,14 +132,15 @@ class AddTicketToCartTest extends TestCase
             'exhibition_id' => $this->exhibition->uuid,
             'ticket_type_id' => $this->ticketType->uuid,
             'theater_room_seat_id' => $this->seat->uuid,
-        ])->assertJsonStructure([
-            'cart_state' => [
-                'uuid',
-                'status',
-                'user',
-                'tickets',
-            ]
-        ])->decodeResponseJson();
+        ])->assertOk()
+            ->assertJsonStructure([
+                'cart_state' => [
+                    'uuid',
+                    'status',
+                    'user',
+                    'tickets',
+                ]
+            ])->decodeResponseJson();
 
         $this->assertArrayNotHasKey('password', $res['cart_state']['user']);
     }

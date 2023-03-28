@@ -1,15 +1,18 @@
 <?php
 
+namespace Tests\Feature\CartManipulation;
+
 use App\Models\Cart;
+use App\Models\CartStatus;
 use App\Models\Exhibition;
 use App\Models\ExhibitionSeat;
 use App\Models\ExhibitionTicketType;
-use App\Models\CartStatus;
 use App\Models\SeatStatus;
 use App\Models\TheaterRoomSeat;
 use App\Models\Ticket;
 use App\Models\TicketType;
 use App\Models\User;
+use Carbon\Carbon;
 use Tests\TestCase;
 
 class RemoveTicketFromCartTest extends TestCase
@@ -17,6 +20,9 @@ class RemoveTicketFromCartTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        $fakeTestNow = Carbon::create('2023', '03', '27', '23', '00');
+        Carbon::setTestNow($fakeTestNow);
 
         $this->activeCartStatus = CartStatus::factory()->create(['name' => CartStatus::ACTIVE]);
         $this->expiredCartStatus = CartStatus::factory()->create(['name' => CartStatus::EXPIRED]);
@@ -97,5 +103,17 @@ class RemoveTicketFromCartTest extends TestCase
 
         $deletedTicket = Ticket::query()->where('uuid', $this->ticket->uuid)->first();
         $this->assertNull($deletedTicket);
+    }
+
+    /** @test */
+    public function should_propagate_the_update_to_the_cart()
+    {
+        $fakeTestNow = Carbon::create('2023', '03', '28', '00', '00');
+        Carbon::setTestNow($fakeTestNow);
+        $this->actingAs($this->user)->postJson(route('api.cart.remove-ticket'), [
+            'ticket_id' => $this->ticket->uuid,
+            'cart_id' => $this->cart->uuid,
+        ])->assertOk();
+        $this->assertEquals($fakeTestNow->toDateTimeString(), $this->cart->fresh()->updated_at->toDateTimeString());
     }
 }

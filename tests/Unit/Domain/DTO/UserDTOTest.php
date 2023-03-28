@@ -9,7 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 class UserDTOTest extends TestCase
 {
-    public function testCanBeCreatedFromValidData(): void
+    /** @test */
+    public function should_instantiate_a_user_dto_instance_with_valid_data(): void
     {
         $data = [
             'uuid' => '123',
@@ -32,7 +33,8 @@ class UserDTOTest extends TestCase
         $this->assertEquals($data['email_verified_at'], $user->email_verified_at->toDateTimeString());
     }
 
-    public function testThrowsExceptionIfNameIsEmpty(): void
+    /** @test */
+    public function should_throw_an_exception_if_name_is_empty(): void
     {
         $data = [
             'uuid' => '123',
@@ -48,7 +50,8 @@ class UserDTOTest extends TestCase
         UserDTO::fromArray($data);
     }
 
-    public function testThrowsExceptionIfUuidIsEmpty(): void
+    /** @test */
+    public function should_throw_an_exception_if_uuid_is_empty(): void
     {
         $data = [
             'uuid' => '',
@@ -63,6 +66,4 @@ class UserDTOTest extends TestCase
 
         UserDTO::fromArray($data);
     }
-
-    // add more test cases as needed
 }
