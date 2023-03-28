@@ -3,21 +3,20 @@
 namespace App\Services;
 
 use App\Domain\DTO\ExhibitionDTO;
-use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\Connection;
 use Illuminate\Support\Collection;
 use Error;
-use Exception;
 use Illuminate\Support\Str;
 
 // TODO remove these imports after properly layering this service
 use App\Models\ExhibitionSeat;
 use App\Models\SeatStatus;
 use App\Models\TheaterRoomRow;
-use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class PopulateExhibitionSeatsService
 {
-    public function __construct(private readonly DatabaseManager $databaseManager)
+    public function __construct(private readonly Connection $databaseConnection)
     {
     }
 
@@ -25,7 +24,7 @@ class PopulateExhibitionSeatsService
     {
         try {
             // TODO layerize this code
-            $this->databaseManager->beginTransaction();
+            $this->databaseConnection->beginTransaction();
             $rows = TheaterRoomRow::with('seats')->where('theater_room_id', $exhibition->theater_room_id)->get();
             $defaultSeatStatus = SeatStatus::where(['name' => SeatStatus::DEFAULT])->first();
 
@@ -34,9 +33,9 @@ class PopulateExhibitionSeatsService
             }
 
             ExhibitionSeat::query()->insert($this->getInsertData($rows, $defaultSeatStatus, $exhibition));
-            $this->databaseManager->commit();
-        } catch (Exception $e) {
-            $this->databaseManager->rollBack();
+            $this->databaseConnection->commit();
+        } catch (Throwable $e) {
+            $this->databaseConnection->rollBack();
             throw $e;
         }
     }

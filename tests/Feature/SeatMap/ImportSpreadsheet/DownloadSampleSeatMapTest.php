@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace SeatMap\ImportSpreadsheet;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;

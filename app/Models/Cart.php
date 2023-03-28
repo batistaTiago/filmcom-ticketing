@@ -22,9 +22,6 @@ class Cart extends Model
         'cart_status_id',
     ];
 
-    // TODO remove these
-    public $with = ['user', 'status'];
-
     public function tickets()
     {
         return $this->hasMany(Ticket::class, 'cart_id', 'uuid');

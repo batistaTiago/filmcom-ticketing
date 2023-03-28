@@ -18,6 +18,7 @@ class FilmPickingTask(SequentialTaskSet):
     @task
     def get_films(self):
         if not self.token:
+            print("Token was not found...")
             return
 
         selected_film, film_count, page_count = self.film_service.get_films(self.token)

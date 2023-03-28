@@ -123,9 +123,10 @@ class CartDTOTest extends TestCase
     }
 
     /**
+     * @test
      * @dataProvider successDataProvider
      */
-    public function testConstructorSuccess(
+    public function should_instantiate_a_cart_dto_with_valid_values(
         string $uuid,
         UserDTO $user,
         ?CartStatusDTO $status,
@@ -140,9 +141,10 @@ class CartDTOTest extends TestCase
     }
 
     /**
+     * @test
      * @dataProvider errorDataProvider
      */
-    public function testConstructorError(
+    public function should_throw_an_exception_if_invalid_data_is_passed(
         string $uuid,
         UserDTO $user,
         ?CartStatusDTO $status,
@@ -154,7 +156,8 @@ class CartDTOTest extends TestCase
         new CartDTO($uuid, $user, $status, $tickets);
     }
 
-    public function testNullTicketsParameterInitializesAsIlluminateSupportCollection()
+    /** @test */
+    public function should_instantiate_tickets_as_a_collection_if_null_is_passed()
     {
         $uuid = '12345';
         $user = new UserDTO(
@@ -174,7 +177,8 @@ class CartDTOTest extends TestCase
         $this->assertTrue($cartDTO->tickets->isEmpty());
     }
 
-    public function testEloquentCollectionTicketsParameterInitializesAsIlluminateSupportCollection()
+    /** @test */
+    public function should_instantiate_tickets_as_a_collection_if_an_eloquent_collection_is_passed()
     {
         $uuid = '12345';
         $user = new UserDTO(

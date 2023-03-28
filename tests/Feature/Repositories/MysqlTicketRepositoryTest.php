@@ -15,9 +15,10 @@ use Tests\TestCase;
 class MysqlTicketRepositoryTest extends TestCase
 {
     /**
+     * @test
      * @dataProvider validTicketsInCartDataProvider
      */
-    public function testShouldFindAllTheTicketsInACartWithTheirPrices($ticketTypeName, $ticketPrice, $ticketCount)
+    public function should_find_all_the_tickets_in_a_cart_with_their_prices($ticketTypeName, $ticketPrice, $ticketCount)
     {
         $ticketType = TicketType::factory()->create(['name' => $ticketTypeName]);
         $otherTicketType = TicketType::factory()->create(['name' => 'Other']);
@@ -71,13 +72,18 @@ class MysqlTicketRepositoryTest extends TestCase
     }
 
     /**
+     * @test
      * @dataProvider invalidTicketsInCartDataProvider
      */
-    public function testShouldThrowInvalidArgumentExceptionForInvalidTicketPrices($ticketTypeName, $ticketPrice, $ticketCount)
+    public function should_throw_invalid_argument_exception_for_invalid_ticket_prices($ticketTypeName, $ticketPrice, $ticketCount)
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->testShouldFindAllTheTicketsInACartWithTheirPrices($ticketTypeName, $ticketPrice, $ticketCount);
+        $this->should_find_all_the_tickets_in_a_cart_with_their_prices(
+            $ticketTypeName,
+            $ticketPrice,
+            $ticketCount
+        );
     }
 
     public static function validTicketsInCartDataProvider()

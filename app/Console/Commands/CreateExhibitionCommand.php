@@ -15,7 +15,7 @@ use Illuminate\Validation\Validator;
 
 class CreateExhibitionCommand extends Command
 {
-    protected $signature = 'create:exhibition';
+    protected $signature = 'exhibitions:create';
     protected $description = 'Command description';
 
     public const WARNING_MSG = 'This command is not suitable for production. Are you sure you want to continue?';

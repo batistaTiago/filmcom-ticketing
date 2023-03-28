@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace SeatMap;
 
 use App\Models\Exhibition;
 use App\Models\ExhibitionSeat;
@@ -11,7 +11,7 @@ use App\Models\TheaterRoomRow;
 use App\Models\TheaterRoomSeat;
 use Tests\TestCase;
 
-class ShowTheaterRoomTest extends TestCase
+class ShowTheaterRoomSeatMapTest extends TestCase
 {
     /** @test */
     public function should_return_not_found_if_no_room_is_found()
@@ -24,7 +24,7 @@ class ShowTheaterRoomTest extends TestCase
     }
 
     /** @test */
-    public function should_return_a_theater_room_with_its_rows_and_seats_if_one_is_found()
+    public function should_return_a_theater_room_with_its_seat_map_if_one_is_found()
     {
         $seatType = SeatType::factory()->create();
 
@@ -75,7 +75,7 @@ class ShowTheaterRoomTest extends TestCase
     }
 
     /** @test */
-    public function should_return_the_room_map_along_with_the_seat_statuses_for_a_specific_exhibition()
+    public function should_return_the_room_map_along_with_the_seat_map_and_statuses_for_a_specific_exhibition()
     {
         $seatType = SeatType::factory()->create();
         $defaultSeatStatus = SeatStatus::factory()->create(['name' => SeatStatus::DEFAULT]);

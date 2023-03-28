@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace SeatMap\ImportSpreadsheet;
 
 use App\Models\SeatType;
 use App\Models\TheaterRoom;
