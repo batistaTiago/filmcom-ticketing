@@ -52,5 +52,6 @@ Route::prefix('cart')->group(function () {
         Route::post('add-ticket', [CartController::class, 'addTicket'])->name('api.cart.add-ticket');
         Route::post('remove-ticket', [CartController::class, 'removeTicket'])->name('api.cart.remove-ticket');
         Route::post('go-to-checkout', [CartController::class, 'goToCheckout'])->name('api.cart.go-to-checkout');
+        Route::get('my-purchases', [CartController::class, 'myPurchases'])->name('api.cart.my-purchases');
     });
 });

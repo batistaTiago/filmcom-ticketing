@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Repositories\CartRepositoryInterface;
 use App\Domain\Repositories\CartStatusRepositoryInterface;
 use App\Exceptions\ResourceNotFoundException;
 use App\Http\Requests\AddTicketToCartRequest;
@@ -32,22 +33,13 @@ class CartController
         GoToCheckoutRequest $request,
         CartStatusRepositoryInterface $repo,
         ComputeCartStateService $cartStateService,
+        CartRepositoryInterface $cartRepository,
     )
     {
-        $user = $request->user();
-        $cart = Cart::query()
-            ->where('uuid', $request->cart_id)
-            ->whereHas('user', fn ($query) => $query->where('uuid', $user->uuid))
-            ->whereHas('status', fn ($query) => $query->where('name', CartStatus::ACTIVE))
-            ->first();
+        $cart = $cartRepository->getActiveUserCart($request->cart_id, $request->user()->toDto());
 
-        if (empty($cart)) {
-            throw new ResourceNotFoundException('Cart not found');
-        }
-
-        Cart::query()->where('uuid', $cart->uuid)->update([
-            'cart_status_id' => $repo->getByName(CartStatus::AWAITING_PAYMENT)->uuid
-        ]);
+        $awaitPaymentStatus = $repo->getByName(CartStatus::AWAITING_PAYMENT);
+        $cartRepository->updateStatus($cart, $awaitPaymentStatus);
 
         ProcessCartCheckoutJob::dispatch($cart->uuid);
 
