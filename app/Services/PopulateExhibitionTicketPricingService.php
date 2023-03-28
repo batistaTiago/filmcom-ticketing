@@ -4,35 +4,26 @@ namespace App\Services;
 
 use App\Domain\DTO\ExhibitionDTO;
 use App\Models\ExhibitionTicketType;
-use App\Models\TicketType;
-use Illuminate\Database\DatabaseManager;
-use Illuminate\Support\Collection;
-use Error;
-use Exception;
+use Illuminate\Database\Connection;
 use Illuminate\Support\Str;
-
-// TODO remove these imports after properly layering this service
-use App\Models\ExhibitionSeat;
-use App\Models\SeatStatus;
-use App\Models\TheaterRoomRow;
-use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class PopulateExhibitionTicketPricingService
 {
-    public function __construct(private readonly DatabaseManager $databaseManager)
+    public function __construct(private readonly Connection $databaseConnection)
     {
     }
 
     public function execute(ExhibitionDTO $exhibition, array $ticketTypes)
     {
         try {
-            $this->databaseManager->beginTransaction();
+            $this->databaseConnection->beginTransaction();
 
             ExhibitionTicketType::query()->insert($this->getInsertData($exhibition, $ticketTypes));
 
-            $this->databaseManager->commit();
-        } catch (Exception $e) {
-            $this->databaseManager->rollBack();
+            $this->databaseConnection->commit();
+        } catch (Throwable $e) {
+            $this->databaseConnection->rollBack();
             throw $e;
         }
     }

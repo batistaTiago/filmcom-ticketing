@@ -5,14 +5,14 @@ namespace App\Services;
 use App\Models\SeatType;
 use App\Models\TheaterRoomRow;
 use App\Models\TheaterRoomSeat;
-use Exception;
-use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\Connection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Throwable;
 
 class PopulateSeatMapService
 {
-    public function __construct(private readonly DatabaseManager $databaseManager)
+    public function __construct(private readonly Connection $databaseConnection)
     {
     }
 
@@ -25,7 +25,7 @@ class PopulateSeatMapService
         $rowNames = $this->getRowNamesFromSpreadsheet($firstSheet);
 
         try {
-            $this->databaseManager->beginTransaction();
+            $this->databaseConnection->beginTransaction();
 
             if ($shouldRebuildMap) {
                 $this->destroyCurrentMap($theater_room_id);
@@ -33,9 +33,9 @@ class PopulateSeatMapService
 
             $this->buildSeatMap($rowNames, $seatNames, $theater_room_id, $seatTypes, $firstSheet);
 
-            $this->databaseManager->commit();
-        } catch (Exception $e) {
-            $this->databaseManager->rollBack();
+            $this->databaseConnection->commit();
+        } catch (Throwable $e) {
+            $this->databaseConnection->rollBack();
             throw $e;
         }
     }
