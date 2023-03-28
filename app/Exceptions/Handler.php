@@ -55,18 +55,16 @@ class Handler extends ExceptionHandler
         }
 
         if ($e instanceof DomainException) {
-            $trace = $e->getTrace();
             $httpStatus = ($e->getCode() !== 0) ? $e->getCode() : 400;
+            $output = ['error' => $e->getMessage()];
+            if (config('app.debug')) {
+                $appTrace = $this->getAppTrace($e);
 
-            $appTrace = array_filter($trace, function ($item) {
-                return !array_key_exists('file', $item) || !strpos(($item['file']), 'vendor');
-            });
+                $output['app_trace'] = $appTrace;
+                $output['trace'] = $e->getTrace();
+            }
 
-            return response()->json([
-                'error' => $e->getMessage(),
-                'app_trace' => config('app.debug') ? $appTrace : null,
-                'trace' => config('app.debug') ? $e->getTrace() : null
-            ], $httpStatus);
+            return response()->json($output, $httpStatus);
         }
 
         return parent::render($request, $e);
@@ -75,5 +73,12 @@ class Handler extends ExceptionHandler
     protected function shouldReturnJson($request, Throwable $e): bool
     {
         return true;
+    }
+
+    public function getAppTrace(Throwable $e): array
+    {
+        return collect($e->getTrace())->filter(function ($item) {
+            return !array_key_exists('file', $item) || !strpos(($item['file']), 'vendor');
+        })->values()->toArray();
     }
 }
