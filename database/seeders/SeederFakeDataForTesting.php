@@ -20,10 +20,7 @@ class SeederFakeDataForTesting extends Seeder
 {
     public function run(): void
     {
-        $defaultUser = User::query()->firstOrCreate(['email' => 'user@test.dev']);
-        $cartStatuses = CartStatus::all();
-        $ticketTypes = TicketType::all();
-        $userIds = User::query()->select('uuid')->pluck('uuid');
+        $this->createDefaultUser();
         $seatTypes = SeatType::all();
 
         Film::factory()->times(15)->create();
@@ -58,22 +55,18 @@ class SeederFakeDataForTesting extends Seeder
             }
         }
 
-        for ($i = 1; $i <= fake()->numberBetween(100, 400); $i++) {
-            // echo "Creating cart $i" . PHP_EOL;
-            $cart = Cart::factory()->create([
-                'cart_status_id' => $cartStatuses->where('name', 'active')->first()->uuid,
-                'updated_at' => now()->subHours(fake()->numberBetween(300, 16)),
-                'user_id' => $userIds->random()
-            ]);
+    }
 
-            for ($j = 1; $j <= fake()->numberBetween(1, 5); $j++) {
-                // echo "Creating ticket $j in cart $i" . PHP_EOL;
-                Ticket::factory()->create([
-                    'ticket_type_id' => $ticketTypes->random()->uuid,
-                    'updated_at' => $cart->updated_at,
-                    'cart_id' => $cart->uuid,
-                ]);
-            }
-        }
+    private function createDefaultUser()
+    {
+        $uuid = Str::orderedUuid()->toString();
+        $email = 'admin@filmcom.com';
+
+        return User::query()->firstOrCreate(
+            compact('email'),
+            User::factory()->raw(
+                compact('uuid', 'email')
+            )
+        );
     }
 }

@@ -75,4 +75,20 @@ class Ticket extends Model
             ExhibitionTicketTypeDTO::fromArray($data['exhibition_ticket_type']),
         );
     }
+
+    public function prepareToDto(): static
+    {
+        $this->exhibition_ticket_type = $this->exhibition_ticket_types
+            ->where('exhibition_id', $this->exhibition_id)
+            ->first();
+
+        $this->seat->exhibition_seat = $this->seat->exhibition_seats
+            ->where('exhibition_id', $this->exhibition_id)
+            ->first();
+
+        unset($this->exhibition_ticket_types);
+        unset($this->exhibition_seats);
+
+        return $this;
+    }
 }

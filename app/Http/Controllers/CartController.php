@@ -14,6 +14,7 @@ use App\Models\CartStatus;
 use App\Services\ComputeCartStateService;
 use App\UseCases\AddTicketToCartUseCase;
 use App\UseCases\RemoveTicketFromCartUseCase;
+use Illuminate\Http\Request;
 
 class CartController
 {
@@ -36,13 +37,23 @@ class CartController
         CartRepositoryInterface $cartRepository,
     )
     {
-        $cart = $cartRepository->getActiveUserCart($request->cart_id, $request->user()->toDto());
-
+        // TODO layerize this code
+        $cart = $cartRepository->getActiveUserCart($request->cart_id, $request->user()->uuid);
         $awaitPaymentStatus = $repo->getByName(CartStatus::AWAITING_PAYMENT);
         $cartRepository->updateStatus($cart, $awaitPaymentStatus);
 
-        ProcessCartCheckoutJob::dispatch($cart->uuid);
+        ProcessCartCheckoutJob::dispatchSync($cart->uuid);
 
         return response()->json(['cart_state' => $cartStateService->execute($cart->uuid)]);
+    }
+
+    public function myPurchases(
+        Request $request,
+        CartRepositoryInterface $cartRepository,
+    )
+    {
+        // TODO layerize this code
+        $carts = $cartRepository->getFinishedUserCarts($request->user()->uuid);
+        return response()->json($carts);
     }
 }
