@@ -11,12 +11,14 @@
             /*--secondary-color: #A0CAB5; !* Soft Green *!*/
             /*--tertiary-color: #F0EDEE; !* Off White *!*/
             /*--text-color: #1A535C; !* Dark Blue *!*/
+            /*--background-color: #F0EDEE; !* Off White *!*/
 
             /* Color scheme 2 */
-            /*--primary-color: #A2D5F2; !* Light Sky Blue *!*/
-            /*--secondary-color: #97C1A9; !* Muted Green *!*/
-            /*--tertiary-color: #F5E5DE; !* Warm White *!*/
-            /*--text-color: #1B3A4B; !* Navy Blue *!*/
+            --primary-color: #A2D5F2; /* Light Sky Blue */
+            --secondary-color: #97C1A9; /* Muted Green */
+            --tertiary-color: #F5E5DE; /* Warm White */
+            --text-color: #1B3A4B; /* Navy Blue */
+            --background-color: #F5E5DE; /* Warm White */
 
             /* Reddish Tones Color Schemes */
 
@@ -25,20 +27,23 @@
             /*--secondary-color: #FFD5A5; !* Light Orange *!*/
             /*--tertiary-color: #F2E8E6; !* Light Beige *!*/
             /*--text-color: #6C2B2B; !* Maroon *!*/
+            /*--background-color: #F2E8E6; !* Light Beige *!*/
 
             /* Color scheme 4 */
-            /* --primary-color: #FF9AA2; /* Mellow Red */
-            /* --secondary-color: #FFDAC1; /* Peach */
-            /* --tertiary-color: #E2F0CB; /* Pale Green */
-            /* --text-color: #7C3B3B; /* Dark Red */
+            /*--primary-color: #FF9AA2; !* Mellow Red *!*/
+            /*--secondary-color: #FFDAC1; !* Peach *!*/
+            /*--tertiary-color: #E2F0CB; !* Pale Green *!*/
+            /*--text-color: #7C3B3B; !* Dark Red *!*/
+            /*--background-color: #E2F0CB; !* Pale Green *!*/
 
             /* Brown, Green, and White Color Scheme */
 
             /* Color scheme 5 */
-            --primary-color: #4A3C31; /* Dark Brown */
-            --secondary-color: #3D5E46; /* Dark Green */
-            --tertiary-color: #FFFFFF; /* White */
-            --text-color: #4A3C31; /* Dark Brown */
+            /*--primary-color: #4A3C31; !* Dark Brown *!*/
+            /*--secondary-color: #3D5E46; !* Dark Green *!*/
+            /*--tertiary-color: #FFFFFF; !* White *!*/
+            /*--text-color: #4A3C31; !* Dark Brown *!*/
+            /*--background-color: #FFFFFF; !* White *!*/
         }
 
         table {
