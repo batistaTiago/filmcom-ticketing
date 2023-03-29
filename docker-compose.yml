@@ -26,6 +26,7 @@ services:
             DB_HOST: mysql
             REDIS_HOST: redis
             TELESCOPE_ENABLED: true
+            LOG_CHANNEL: stderr
         restart: always
 
     api:
@@ -39,8 +40,6 @@ services:
         extends:
             service: filmcom
         command: php artisan horizon
-        environment:
-            LOG_CHANNEL: stderr
 
     mysql:
         image: mysql:5.7.22

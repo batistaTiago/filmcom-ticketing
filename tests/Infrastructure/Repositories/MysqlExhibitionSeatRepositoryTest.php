@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Feature\Repositories;
+namespace Tests\Infrastructure\Repositories;
 
+use App\Domain\Repositories\ExhibitionSeatRepositoryInterface;
 use App\Models\Exhibition;
-use App\Models\TheaterRoomSeat;
 use App\Models\ExhibitionSeat;
 use App\Models\SeatStatus;
-use App\Domain\Repositories\ExhibitionSeatRepositoryInterface;
+use App\Models\TheaterRoomSeat;
 use Tests\TestCase;
 
 class MysqlExhibitionSeatRepositoryTest extends TestCase

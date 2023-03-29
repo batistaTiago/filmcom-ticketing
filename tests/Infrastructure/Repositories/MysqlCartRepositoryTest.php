@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Feature\Repositories;
+namespace Tests\Infrastructure\Repositories;
 
 use App\Domain\DTO\UserDTO;
-use App\Domain\Repositories\CartStatusRepositoryInterface;
 use App\Domain\Repositories\CartRepositoryInterface;
+use App\Domain\Repositories\CartStatusRepositoryInterface;
 use App\Models\Cart;
 use App\Models\CartStatus;
 use App\Models\Exhibition;
@@ -27,7 +27,6 @@ class MysqlCartRepositoryTest extends TestCase
     ): void {
         $cartStatusRepository = $this->app->make(CartStatusRepositoryInterface::class);
         $sut = $this->app->make(CartRepositoryInterface::class);
-
         $activeStatus = CartStatus::factory()->create(['name' => 'active']);
         $expiredStatus = CartStatus::factory()->create(['name' => 'expired']);
 

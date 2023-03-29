@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Repositories;
+namespace Tests\Infrastructure\Repositories;
 
 use App\Models\Cart;
 use App\Models\CartStatus;

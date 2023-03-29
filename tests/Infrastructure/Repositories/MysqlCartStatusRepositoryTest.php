@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Repositories;
+namespace Tests\Infrastructure\Repositories;
 
 use App\Domain\DTO\Cart\CartStatusDTO;
 use App\Domain\Repositories\CartStatusRepositoryInterface;

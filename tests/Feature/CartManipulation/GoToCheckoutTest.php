@@ -2,7 +2,9 @@
 
 namespace CartManipulation;
 
-use App\Jobs\ProcessCartCheckoutJob;
+use App\Jobs\Checkout\IssueTicketsJob;
+use App\Jobs\Checkout\ProcessCartPaymentJob;
+use App\Jobs\Checkout\SendPurchaseCompleteEmailJob;
 use App\Models\Cart;
 use App\Models\CartStatus;
 use App\Models\Exhibition;
@@ -92,7 +94,6 @@ class GoToCheckoutTest extends TestCase
     /** @test */
     public function should_update_the_cart_to_awaiting_payment_status()
     {
-        $this->withoutExceptionHandling();
         Bus::fake();
 
         $this->actingAs($this->user)->postJson(route('api.cart.go-to-checkout'), [
@@ -101,7 +102,12 @@ class GoToCheckoutTest extends TestCase
 
         $this->assertEquals(CartStatus::AWAITING_PAYMENT, $this->cart->fresh()->status->name);
 
-        Bus::assertDispatchedTimes(ProcessCartCheckoutJob::class, 1);
+//        Bus::assertDispatchedTimes(ProcessCartCheckoutJob::class, 1);
+        Bus::assertChained([
+            ProcessCartPaymentJob::class,
+            IssueTicketsJob::class,
+            SendPurchaseCompleteEmailJob::class,
+        ]);
     }
 
     /** @test */
