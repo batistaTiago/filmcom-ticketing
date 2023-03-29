@@ -3,6 +3,8 @@
 namespace App\Domain\Repositories;
 
 use App\Domain\DTO\Cart\CartDTO;
+use App\Domain\DTO\TheaterRoom\TheaterRoomSeatStatusDTO;
+use App\Domain\DTO\TicketDTO;
 use Illuminate\Support\Collection;
 
 interface TicketRepositoryInterface
@@ -14,5 +16,10 @@ interface TicketRepositoryInterface
         string $exhibition_id,
         string $theater_room_seat_id,
         string $ticket_type_id,
+    ): void;
+
+    public function changeStatus(
+        TicketDTO $ticket,
+        TheaterRoomSeatStatusDTO|string $status
     ): void;
 }

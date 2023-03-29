@@ -2,7 +2,9 @@
 
 namespace CartManipulation;
 
-use App\Jobs\ProcessCartCheckoutJob;
+use App\Jobs\Checkout\IssueTicketsJob;
+use App\Jobs\Checkout\ProcessCartPaymentJob;
+use App\Jobs\Checkout\SendPurchaseCompleteEmailJob;
 use App\Models\Cart;
 use App\Models\CartStatus;
 use App\Models\Exhibition;
@@ -58,7 +60,7 @@ class GoToCheckoutTest extends TestCase
             'user_id' => $this->user->uuid,
         ]);
 
-        Ticket::factory()->create([
+        $this->ticket = Ticket::factory()->create([
             'cart_id' => $this->cart->uuid,
             'exhibition_id' => $exhibition->uuid,
             'ticket_type_id' => $ticketType->uuid,
@@ -100,16 +102,30 @@ class GoToCheckoutTest extends TestCase
 
         $this->assertEquals(CartStatus::AWAITING_PAYMENT, $this->cart->fresh()->status->name);
 
-        Bus::assertDispatchedTimes(ProcessCartCheckoutJob::class, 1);
+//        Bus::assertDispatchedTimes(ProcessCartCheckoutJob::class, 1);
+        Bus::assertChained([
+            ProcessCartPaymentJob::class,
+            IssueTicketsJob::class,
+            SendPurchaseCompleteEmailJob::class,
+        ]);
     }
 
     /** @test */
     public function should_update_the_cart_to_finished_status_after_job_execution()
     {
+        $soldSeatStatus = SeatStatus::factory()->create(['name' => SeatStatus::SOLD]);
+
         $this->actingAs($this->user)->postJson(route('api.cart.go-to-checkout'), [
             'cart_id' => $this->cart->uuid,
         ])->assertOk();
 
         $this->assertEquals(CartStatus::FINISHED, $this->cart->fresh()->status->name);
+
+        $this->assertDatabaseCount('exhibition_seats', 1);
+        $this->assertDatabaseHas('exhibition_seats', [
+            'exhibition_id' => $this->ticket->exhibition_id,
+            'theater_room_seat_id' => $this->ticket->theater_room_seat_id,
+            'seat_status_id' => $soldSeatStatus->uuid
+        ]);
     }
 }

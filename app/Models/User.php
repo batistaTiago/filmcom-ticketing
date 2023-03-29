@@ -36,6 +36,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function carts()
+    {
+        return $this->hasMany(Cart::class, 'user_id', 'uuid');
+    }
+
     public function toDto(): UserDTO
     {
         return new UserDTO(

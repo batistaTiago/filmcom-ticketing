@@ -26,6 +26,7 @@ services:
             DB_HOST: mysql
             REDIS_HOST: redis
             TELESCOPE_ENABLED: true
+            LOG_CHANNEL: stderr
         restart: always
 
     api:
@@ -33,24 +34,12 @@ services:
             service: filmcom
         ports:
             - "9098:9000"
-        command: php artisan serve --host=0.0.0.0 --port=9000
-#        command: php artisan octane:start --host=0.0.0.0 --port=9000 --server=swoole
+        command: php artisan octane:start --host=0.0.0.0 --port=9000 --server=swoole
 
     worker:
         extends:
             service: filmcom
         command: php artisan horizon
-        environment:
-            LOG_CHANNEL: stderr
-
-    cron:
-        extends:
-            service: filmcom
-        build:
-            context: .
-            dockerfile: Dockerfile-cron
-        environment:
-            LOG_CHANNEL: stderr
 
     mysql:
         image: mysql:5.7.22

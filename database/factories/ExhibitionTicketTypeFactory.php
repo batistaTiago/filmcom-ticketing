@@ -15,6 +15,7 @@ class ExhibitionTicketTypeFactory extends Factory
             'uuid' => Str::orderedUuid()->toString(),
             'exhibition_id' => Exhibition::factory(),
             'ticket_type_id' => TicketType::factory(),
+            'price' => fake()->numberBetween(1000, 9999),
         ];
     }
 }

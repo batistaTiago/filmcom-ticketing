@@ -45,14 +45,14 @@ class Cart extends Model
             uuid: $this->uuid,
             user: UserDTO::fromArray($this->user->attributes),
             status: CartStatusDTO::fromArray($this->status->attributes),
-            tickets: !empty($data['tickets']) ? $this->convertTicketsToDTO($data['tickets']) : null,
+            tickets: !empty($data['tickets']) ? $this->convertTicketsToDTO($this->tickets) : null,
         );
     }
 
-    private function convertTicketsToDTO(Collection $tickets)
+    private function convertTicketsToDTO(Collection $tickets): Collection
     {
-        return $tickets->map(function (Ticket $ticket) {
-            return $ticket->toDTO();
-        })->toArray();
+        return $tickets->map(function ($ticket) {
+            return $ticket->prepareToDto()->toDto();
+        });
     }
 }

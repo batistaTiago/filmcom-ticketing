@@ -74,21 +74,27 @@ class PopulateSeatMapService
         Collection $firstSheetAsCollection,
     ): void
     {
+        $rowData = [];
+        $seats = [];
+
         foreach ($rowNames as $rowIndex => $rowName) {
-            $createdRow = TheaterRoomRow::query()->create([
+            $rowData[] = $createdRow = [
                 'uuid' => Str::orderedUuid()->toString(),
                 'name' => $rowName,
                 'theater_room_id' => $theater_room_id,
-            ]);
+            ];
 
             foreach ($seatNames as $seatIndex => $seatName) {
-                TheaterRoomSeat::query()->create([
+                $seats[] = [
                     'uuid' => Str::orderedUuid()->toString(),
                     'name' => $seatName,
-                    'theater_room_row_id' => $createdRow->uuid,
+                    'theater_room_row_id' => $createdRow['uuid'],
                     'seat_type_id' => $seatTypes[$firstSheetAsCollection[$rowIndex][$seatIndex]],
-                ]);
+                ];
             }
         }
+
+        TheaterRoomRow::query()->insert($rowData);
+        TheaterRoomSeat::query()->insert($seats);
     }
 }

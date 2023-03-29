@@ -24,7 +24,7 @@ class CreateFilmTask(SequentialTaskSet):
 
     @task
     def login(self):
-        email = "user@test.dev"
+        email = "admin@filmcom.com"
         password = "password"
         self.token = self.auth_service.login(email, password)
 

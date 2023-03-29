@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Jobs\Checkout;
 
 use App\Domain\Repositories\CartRepositoryInterface;
 use App\Domain\Repositories\CartStatusRepositoryInterface;
-use App\Models\Cart;
 use App\Models\CartStatus;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class ProcessCartCheckoutJob
+class IssueTicketsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -21,19 +21,19 @@ class ProcessCartCheckoutJob
     { }
 
     public function handle(
+        CartRepositoryInterface $cartRepository,
         CartStatusRepositoryInterface $cartStatusRepository,
-        CartRepositoryInterface $cartRepository
     ): void
     {
-        // TODO process payment and make tickets available to the buyer
         $cartRepository->updateStatus($this->cart_id, $cartStatusRepository->getByName(CartStatus::FINISHED));
+        $cartRepository->issueTickets($this->cart_id);
     }
 
     public function tags(): array
     {
         return [
-            "process-cart-checkout",
-            "process-cart-checkout:" . $this->cart_id,
+            "issue-tickets",
+            "issue-tickets:" . $this->cart_id,
         ];
     }
 }
