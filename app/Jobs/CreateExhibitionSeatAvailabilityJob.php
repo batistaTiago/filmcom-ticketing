@@ -28,8 +28,8 @@ class CreateExhibitionSeatAvailabilityJob implements ShouldQueue
     public function tags(): array
     {
         return [
-            "process-seat-map-spreadsheet",
-            "process-seat-map-spreadsheet:" . Str::orderedUuid()->toString(),
+            "create-exhibition-seat-availability",
+            "create-exhibition-seat-availability:" . $this->exhibition->uuid,
         ];
     }
 }
