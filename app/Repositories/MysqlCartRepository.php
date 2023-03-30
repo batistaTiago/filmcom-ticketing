@@ -40,21 +40,7 @@ class MysqlCartRepository implements CartRepositoryInterface
     {
         $user_id = $userInput instanceof UserDTO ? $userInput->uuid : $userInput;
 
-        $cart = Cart::query()
-            ->with([
-                'user',
-                'status',
-                'tickets' => function ($query) {
-                    $query->with([
-                        'type',
-                        'seat.type',
-                        'seat.exhibition_seats.seat_status',
-                        'exhibition',
-                        'exhibition_ticket_types'
-                    ]);
-                }
-            ])
-            ->has('tickets')
+        $cart = $this->baseQuery()
             ->whereHas('user', fn ($query) => $query->where('uuid', $user_id))
             ->whereHas('status', fn ($query) => $query->where('name', CartStatus::ACTIVE))
             ->where('uuid', $uuid)
@@ -134,6 +120,7 @@ class MysqlCartRepository implements CartRepositoryInterface
                 'tickets' => function ($query) {
                     $query->with([
                         'type',
+                        'seat.row',
                         'seat.type',
                         'seat.exhibition_seats.seat_status',
                         'exhibition',

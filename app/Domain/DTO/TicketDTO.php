@@ -2,6 +2,7 @@
 
 namespace App\Domain\DTO;
 
+use App\Domain\DTO\TheaterRoom\TheaterRoomRowDTO;
 use App\Domain\DTO\TheaterRoom\TheaterRoomSeatDTO;
 use InvalidArgumentException;
 
@@ -10,6 +11,7 @@ class TicketDTO
     public function __construct(
         public readonly string $uuid,
         public readonly string $cart_id,
+        public ?TheaterRoomRowDTO $row = null,
         public ?TheaterRoomSeatDTO $seat = null,
         public ?ExhibitionDTO $exhibition = null,
         public ?TicketTypeDTO $type = null,

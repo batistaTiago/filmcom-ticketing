@@ -155,6 +155,7 @@
         <table>
             <thead>
             <tr>
+                <th>Row</th>
                 <th>Seat</th>
                 <th>Exhibition Date</th>
                 <th>Ticket Type</th>
@@ -164,12 +165,14 @@
             <tbody>
             @foreach ($cart_state->tickets as $ticket)
                 @php
+                    $row = $ticket->row;
                     $seat = $ticket->seat;
                     $exhibition = $ticket->exhibition;
                     $ticketTypeExhibitionInfo = $ticket->ticketTypeExhibitionInfo;
                     $price = $ticketTypeExhibitionInfo->price / 100;
                 @endphp
                 <tr>
+                    <td>{{ $row->name }}</td>
                     <td>{{ $seat->name }} ({{ $seat->type->name }})</td>
                     <td>{{ \Carbon\Carbon::parse($exhibition->starts_at)->format('F j, Y, g:i A') }} ({{ \Carbon\Carbon::parse($exhibition->starts_at)->dayName }})</td>
                     <td>{{ $ticket->type->name }}</td>
