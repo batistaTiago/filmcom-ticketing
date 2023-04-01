@@ -28,7 +28,6 @@ services:
             QUEUE_CONNECTION: redis
             TELESCOPE_ENABLED: true
             LOG_CHANNEL: stderr
-
         restart: always
 
     api:

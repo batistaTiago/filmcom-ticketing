@@ -99,12 +99,12 @@ return [
     */
 
     'trim' => [
-        'recent' => 60,
-        'pending' => 60,
-        'completed' => 60,
-        'recent_failed' => 10080,
-        'failed' => 10080,
-        'monitored' => 10080,
+        'recent' => env('APP_JOB_RETAIN_TIME_IN_MINUTES', 525960),
+        'pending' => env('APP_JOB_RETAIN_TIME_IN_MINUTES', 525960),
+        'completed' => env('APP_JOB_RETAIN_TIME_IN_MINUTES', 525960),
+        'recent_failed' => env('APP_JOB_RETAIN_TIME_IN_MINUTES', 525960),
+        'failed' => env('APP_JOB_RETAIN_TIME_IN_MINUTES', 525960),
+        'monitored' => env('APP_JOB_RETAIN_TIME_IN_MINUTES', 525960),
     ],
 
     /*
