@@ -30,8 +30,8 @@ class PopulateExhibitionTicketPricingJob implements ShouldQueue
     public function tags(): array
     {
         return [
-            "process-seat-map-spreadsheet",
-            "process-seat-map-spreadsheet:" . Str::orderedUuid()->toString(),
+            "populate-exhibition-ticket-pricing",
+            "populate-exhibition-ticket-pricing:" . $this->exhibition->uuid,
         ];
     }
 }

@@ -25,6 +25,7 @@ services:
         environment:
             DB_HOST: mysql
             REDIS_HOST: redis
+            QUEUE_CONNECTION: redis
             TELESCOPE_ENABLED: true
             LOG_CHANNEL: stderr
         restart: always
@@ -66,6 +67,8 @@ services:
             - 6380:6379
         volumes:
             - redis_data:/data
+#            - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+#        command: redis-server /usr/local/etc/redis/redis.conf
 
     locust_base:
         build:

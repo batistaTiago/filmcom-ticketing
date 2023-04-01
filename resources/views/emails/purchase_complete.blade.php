@@ -4,8 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Purchase Complete - FilmCom</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Montserrat and Open Sans -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" />
+
+    <!-- Playfair Display and Lora -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&display=swap" />
+
+    <!-- Raleway and Noto Sans -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" />
+
     <style>
         :root {
+            /* Typography */
+            --heading-font: 'Playfair Display', sans-serif;
+            --body-font: 'Lora', sans-serif;
+
             /* Color scheme 1 */
             /*--primary-color: #89CFF0; !* Baby Blue *!*/
             /*--secondary-color: #A0CAB5; !* Soft Green *!*/
@@ -64,13 +82,20 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: var(--body-font);
             font-size: 16px;
             line-height: 1.6;
             color: var(--text-color);
             background-color: var(--background-color);
             margin: 0;
             padding: 0;
+        }
+
+        .header h1 {
+            font-family: var(--heading-font);
+            font-size: 28px;
+            color: var(--primary-color);
+            margin: 0;
         }
 
         .container {
@@ -87,17 +112,18 @@
             border-bottom: 1px solid var(--secondary-color);
         }
 
-        .header h1 {
-            font-size: 24px;
-            color: var(--primary-color);
-            margin: 0;
-        }
-
         .content {
             padding: 20px 0;
         }
 
+        .content h2 {
+            font-size: 24px;
+            color: var(--secondary-color);
+            margin-top: 0;
+        }
+
         .cart-summary {
+            font-size: 20px;
             background-color: #f2f2f2;
             padding: 1em;
             margin-top: 1em;
@@ -129,6 +155,7 @@
         <table>
             <thead>
             <tr>
+                <th>Row</th>
                 <th>Seat</th>
                 <th>Exhibition Date</th>
                 <th>Ticket Type</th>
@@ -138,12 +165,14 @@
             <tbody>
             @foreach ($cart_state->tickets as $ticket)
                 @php
+                    $row = $ticket->row;
                     $seat = $ticket->seat;
                     $exhibition = $ticket->exhibition;
                     $ticketTypeExhibitionInfo = $ticket->ticketTypeExhibitionInfo;
                     $price = $ticketTypeExhibitionInfo->price / 100;
                 @endphp
                 <tr>
+                    <td>{{ $row->name }}</td>
                     <td>{{ $seat->name }} ({{ $seat->type->name }})</td>
                     <td>{{ \Carbon\Carbon::parse($exhibition->starts_at)->format('F j, Y, g:i A') }} ({{ \Carbon\Carbon::parse($exhibition->starts_at)->dayName }})</td>
                     <td>{{ $ticket->type->name }}</td>

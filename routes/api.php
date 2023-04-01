@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CartHistoryController;
 use App\Http\Controllers\ExhibitionController;
 use App\Http\Controllers\FilmController;
 use App\Http\Controllers\SeatMapImportController;
@@ -53,5 +54,6 @@ Route::prefix('cart')->group(function () {
         Route::post('remove-ticket', [CartController::class, 'removeTicket'])->name('api.cart.remove-ticket');
         Route::post('go-to-checkout', [CartController::class, 'goToCheckout'])->name('api.cart.go-to-checkout');
         Route::get('my-purchases', [CartController::class, 'myPurchases'])->name('api.cart.my-purchases');
+        Route::get('history', [CartHistoryController::class, 'getCartHistory'])->name('api.cart.history');
     });
 });

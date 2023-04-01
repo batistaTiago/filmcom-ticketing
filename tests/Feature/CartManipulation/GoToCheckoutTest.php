@@ -102,7 +102,6 @@ class GoToCheckoutTest extends TestCase
 
         $this->assertEquals(CartStatus::AWAITING_PAYMENT, $this->cart->fresh()->status->name);
 
-//        Bus::assertDispatchedTimes(ProcessCartCheckoutJob::class, 1);
         Bus::assertChained([
             ProcessCartPaymentJob::class,
             IssueTicketsJob::class,

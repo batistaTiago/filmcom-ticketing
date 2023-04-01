@@ -3,6 +3,7 @@
 namespace Domain\DTO;
 
 use App\Domain\DTO\ExhibitionDTO;
+use App\Domain\DTO\TheaterRoom\TheaterRoomRowDTO;
 use App\Domain\DTO\TheaterRoom\TheaterRoomSeatDTO;
 use App\Domain\DTO\TheaterRoom\TheaterRoomSeatTypeDTO;
 use App\Domain\DTO\TicketDTO;
@@ -21,11 +22,12 @@ class TicketDTOTest extends TestCase
     public function should_create_a_ticket_instance(
         string $uuid,
         string $cart_id,
+        TheaterRoomRowDTO $row = null,
         TheaterRoomSeatDTO $seat = null,
         ExhibitionDTO $exhibition = null,
         TicketTypeDTO $type = null
     ) {
-        $ticket = new TicketDTO($uuid, $cart_id, $seat, $exhibition, $type);
+        $ticket = new TicketDTO($uuid, $cart_id, $row, $seat, $exhibition, $type);
         $this->assertInstanceOf(TicketDTO::class, $ticket);
         $this->assertEquals($uuid, $ticket->uuid);
         $this->assertEquals($cart_id, $ticket->cart_id);
@@ -42,6 +44,7 @@ class TicketDTOTest extends TestCase
                 '4321',
                 null,
                 null,
+                null,
                 null
             ],
 
@@ -52,28 +55,32 @@ class TicketDTOTest extends TestCase
             [
                 '5678',
                 '8765',
-                new TheaterRoomSeatDTO('9876', 'Seat A1', new TheaterRoomSeatTypeDTO('arbitrary-uuid', 'A')),
+                new TheaterRoomRowDTO('9876', 'Row A'),
+                new TheaterRoomSeatDTO('9876', 'Seat 1', new TheaterRoomSeatTypeDTO('arbitrary-uuid', 'A')),
                 new ExhibitionDTO('4567', 'Film A', 'Room 1', '2023-03-24 14:00:00', 1, true),
                 new TicketTypeDTO('1111', 'Regular')
             ],
             [
                 '9101',
                 '1019',
-                new TheaterRoomSeatDTO('1212', 'Seat B1', new TheaterRoomSeatTypeDTO('arbitrary-uuid', 'B')),
+                new TheaterRoomRowDTO('9876', 'Row B'),
+                new TheaterRoomSeatDTO('1212', 'Seat 1', new TheaterRoomSeatTypeDTO('arbitrary-uuid', 'B')),
                 new ExhibitionDTO('1313', 'Film B', 'Room 2', '2023-03-24 20:00:00', 3, true),
                 new TicketTypeDTO('1414', 'VIP')
             ],
             [
                 '1516',
                 '6151',
-                new TheaterRoomSeatDTO('1617', 'Seat C1', new TheaterRoomSeatTypeDTO('arbitrary-uuid', 'C')),
+                new TheaterRoomRowDTO('9876', 'Row C'),
+                new TheaterRoomSeatDTO('1617', 'Seat 1', new TheaterRoomSeatTypeDTO('arbitrary-uuid', 'C')),
                 new ExhibitionDTO('1819', 'Film C', 'Room 3', '2023-03-25 16:00:00', 5, false),
                 new TicketTypeDTO('2021', 'Student')
             ],
             [
                 '2223',
                 '3222',
-                new TheaterRoomSeatDTO('2324', 'Seat D1', new TheaterRoomSeatTypeDTO('arbitrary-uuid', 'D')),
+                new TheaterRoomRowDTO('9876', 'Row D'),
+                new TheaterRoomSeatDTO('2324', 'Seat 1', new TheaterRoomSeatTypeDTO('arbitrary-uuid', 'D')),
                 new ExhibitionDTO('2526', 'Film D', 'Room 4', '2023-03-25 22:00:00', 7, true),
                 new TicketTypeDTO('2728', 'Senior')
             ],

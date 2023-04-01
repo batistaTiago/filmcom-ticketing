@@ -16,7 +16,7 @@ class PurchaseCompleteMailable extends Mailable
 
     public function build()
     {
-        return $this->subject('Your Email Subject')
+        return $this->subject('Thank you for your purchase at FilmCom.')
             ->view('emails.purchase_complete', ['cart_state' => $this->cart_state]);
     }
 }
