@@ -37,6 +37,11 @@ class Cart extends Model
         return $this->hasOne(CartStatus::class, 'uuid', 'cart_status_id');
     }
 
+    public function history()
+    {
+        return $this->hasMany(CartHistory::class, 'cart_id', 'uuid');
+    }
+
     public function toDto(): CartDTO
     {
         $data = $this->toArray();

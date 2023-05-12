@@ -28,7 +28,7 @@ class AddTicketToCartUseCase
             $data['theater_room_seat_id'],
         );
 
-        $cart = $this->cartRepository->getOrCreateCart($this->auth->user()->uuid, $data['cart_id'] ?? null);
+        $cart = $this->cartRepository->getOrCreateActiveCart($this->auth->user()->uuid, $data['cart_id'] ?? null);
         $this->ticketRepository->createTicketInCart(
             $cart->uuid,
             $data['exhibition_id'],

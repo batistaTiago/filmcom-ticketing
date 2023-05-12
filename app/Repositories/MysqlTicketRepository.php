@@ -18,7 +18,7 @@ class MysqlTicketRepository implements TicketRepositoryInterface
 {
     public function findTicketsInCart(string $cartUuid): Collection
     {
-        $relations = ['type', 'seat.type', 'seat.exhibition_seats.seat_status', 'exhibition', 'exhibition_ticket_types'];
+        $relations = ['type', 'seat.row', 'seat.type', 'seat.exhibition_seats.seat_status', 'exhibition', 'exhibition_ticket_types'];
         $tickets = Ticket::query()
             ->with($relations)
             ->where('cart_id', $cartUuid)

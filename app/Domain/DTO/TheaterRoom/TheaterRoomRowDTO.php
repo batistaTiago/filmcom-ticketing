@@ -9,6 +9,8 @@ class TheaterRoomRowDTO
     public readonly string $uuid;
     public string $name;
 
+    public const ATTRIBUTES = ['uuid', 'name', 'seats'];
+
     /** @var TheaterRoomSeatDTO[] */
     public array $seats;
 
@@ -28,5 +30,10 @@ class TheaterRoomRowDTO
         $this->uuid = $uuid;
         $this->name = $name;
         $this->seats = $seats;
+    }
+
+    public static function fromArray($data): static
+    {
+        return new static(...array_intersect_key($data, array_flip(self::ATTRIBUTES)));
     }
 }

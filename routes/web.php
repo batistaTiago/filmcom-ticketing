@@ -11,8 +11,8 @@ Route::get('seat_map/{room_id}', fn () => view('seat_map'));
 Route::get('exhibition_seat_map/{exhibition_id}', fn () => view('exhibition_seat_map'));
 
 
-Route::get('emails/purchase_complete', function () {
+Route::get('emails/purchase_complete', function (ComputeCartStateService $service) {
     $cart_id = request()->cart_id;
-    $data = ['cart_state' => resolve(ComputeCartStateService::class)->execute($cart_id)];
+    $data = ['cart_state' => $service->execute($cart_id)];
     return view('emails.purchase_complete', $data);
 });
