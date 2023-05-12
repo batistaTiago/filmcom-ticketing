@@ -36,5 +36,3 @@ VERSION=v2 && \
 ```
 docker build . -t ekyidag/filmcom-ticketing -f ./Dockerfile
 ```
-
-### Building the CRON Image

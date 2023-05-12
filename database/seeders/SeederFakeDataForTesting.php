@@ -14,7 +14,6 @@ use App\Models\Ticket;
 use App\Models\TicketType;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class SeederFakeDataForTesting extends Seeder
 {
@@ -52,6 +51,28 @@ class SeederFakeDataForTesting extends Seeder
                         ]);
                     }
                 }
+            }
+        }
+
+        $cartStatuses = CartStatus::all();
+        $ticketTypes = TicketType::all();
+        $userIds = User::query()->select('uuid')->pluck('uuid');
+
+        for ($i = 1; $i <= fake()->numberBetween(10, 100); $i++) {
+            echo "Creating cart $i" . PHP_EOL;
+            $cart = Cart::factory()->create([
+                'cart_status_id' => $cartStatuses->random()->uuid,
+                'updated_at' => now()->subHours(fake()->numberBetween(-300, -16)),
+                'user_id' => $userIds->random()
+            ]);
+
+            for ($j = 1; $j <= fake()->numberBetween(1, 5); $j++) {
+                echo "Creating ticket $j in cart $i" . PHP_EOL;
+                Ticket::factory()->create([
+                    'ticket_type_id' => $ticketTypes->random()->uuid,
+                    'updated_at' => $cart->updated_at,
+                    'cart_id' => $cart->uuid,
+                ]);
             }
         }
     }

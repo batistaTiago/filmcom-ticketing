@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class CreateUserCommand extends Command
 {
-    protected $signature = 'create:user';
+    protected $signature = 'users:create';
     protected $description = 'Command description';
 
     public const WARNING_MSG = 'This command is not suitable for production. Are you sure you want to continue?';

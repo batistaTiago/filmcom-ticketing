@@ -41,6 +41,8 @@ services:
         extends:
             service: filmcom
         command: php artisan horizon
+        environment:
+            LOG_CHANNEL: stderr
 
     mysql:
         image: mysql:5.7.22
