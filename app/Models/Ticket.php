@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Domain\DTO\ExhibitionDTO;
 use App\Domain\DTO\ExhibitionTicketTypeDTO;
+use App\Domain\DTO\TheaterRoom\TheaterRoomRowDTO;
 use App\Domain\DTO\TheaterRoom\TheaterRoomSeatDTO;
 use App\Domain\DTO\TheaterRoom\TheaterRoomSeatStatusDTO;
 use App\Domain\DTO\TheaterRoom\TheaterRoomSeatTypeDTO;
@@ -62,17 +63,34 @@ class Ticket extends Model
         $data = $this->toArray();
 
         return new TicketDTO(
-            $data['uuid'],
-            $data['cart_id'],
-            new TheaterRoomSeatDTO(
+            uuid: $data['uuid'],
+            cart_id: $data['cart_id'],
+            row: TheaterRoomRowDTO::fromArray($data['seat']['row']),
+            seat: new TheaterRoomSeatDTO(
                 uuid: $data['seat']['uuid'],
                 name: $data['seat']['name'],
                 type: TheaterRoomSeatTypeDTO::fromArray($data['seat']['type']),
                 status: TheaterRoomSeatStatusDTO::fromArray($data['seat']['exhibition_seat']['seat_status']),
             ),
-            ExhibitionDTO::fromArray($data['exhibition']),
-            TicketTypeDTO::fromArray($data['type']),
-            ExhibitionTicketTypeDTO::fromArray($data['exhibition_ticket_type']),
+            exhibition: ExhibitionDTO::fromArray($data['exhibition']),
+            type: TicketTypeDTO::fromArray($data['type']),
+            ticketTypeExhibitionInfo: ExhibitionTicketTypeDTO::fromArray($data['exhibition_ticket_type']),
         );
+    }
+
+    public function prepareToDto(): static
+    {
+        $this->exhibition_ticket_type = $this->exhibition_ticket_types
+            ->where('exhibition_id', $this->exhibition_id)
+            ->first();
+
+        $this->seat->exhibition_seat = $this->seat->exhibition_seats
+            ->where('exhibition_id', $this->exhibition_id)
+            ->first();
+
+        unset($this->exhibition_ticket_types);
+        unset($this->exhibition_seats);
+
+        return $this;
     }
 }

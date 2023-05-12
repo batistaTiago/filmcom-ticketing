@@ -37,6 +37,11 @@ class Cart extends Model
         return $this->hasOne(CartStatus::class, 'uuid', 'cart_status_id');
     }
 
+    public function history()
+    {
+        return $this->hasMany(CartHistory::class, 'cart_id', 'uuid');
+    }
+
     public function toDto(): CartDTO
     {
         $data = $this->toArray();
@@ -45,14 +50,14 @@ class Cart extends Model
             uuid: $this->uuid,
             user: UserDTO::fromArray($this->user->attributes),
             status: CartStatusDTO::fromArray($this->status->attributes),
-            tickets: !empty($data['tickets']) ? $this->convertTicketsToDTO($data['tickets']) : null,
+            tickets: !empty($data['tickets']) ? $this->convertTicketsToDTO($this->tickets) : null,
         );
     }
 
-    private function convertTicketsToDTO(Collection $tickets)
+    private function convertTicketsToDTO(Collection $tickets): Collection
     {
-        return $tickets->map(function (Ticket $ticket) {
-            return $ticket->toDTO();
-        })->toArray();
+        return $tickets->map(function ($ticket) {
+            return $ticket->prepareToDto()->toDto();
+        });
     }
 }

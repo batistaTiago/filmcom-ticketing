@@ -2,18 +2,19 @@
 
 namespace Database\Factories;
 
+use App\Models\Cart;
+use App\Models\CartStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-class FilmFactory extends Factory
+class CartHistoryFactory extends Factory
 {
     public function definition(): array
     {
         return [
             'uuid' => Str::orderedUuid()->toString(),
-            'name' => fake()->catchPhrase,
-            'year' => $this->faker->year,
-            'duration' => $this->faker->numberBetween(90, 180)
+            'cart_status_id' => CartStatus::factory(),
+            'cart_id' => Cart::factory(),
         ];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Repositories;
 
+use App\Domain\DTO\TheaterRoom\TheaterRoomSeatStatusDTO;
+use App\Domain\DTO\TicketDTO;
 use App\Domain\Repositories\TicketRepositoryInterface;
 use App\Exceptions\ResourceNotFoundException;
 use App\Models\Cart;
@@ -16,28 +18,16 @@ class MysqlTicketRepository implements TicketRepositoryInterface
 {
     public function findTicketsInCart(string $cartUuid): Collection
     {
-        $relations = ['type', 'seat.type', 'seat.exhibition_seats.seat_status', 'exhibition', 'exhibition_ticket_types'];
+        $relations = ['type', 'seat.row', 'seat.type', 'seat.exhibition_seats.seat_status', 'exhibition', 'exhibition_ticket_types'];
         $tickets = Ticket::query()
             ->with($relations)
             ->where('cart_id', $cartUuid)
             ->get();
 
         return $tickets->map(function (Ticket $ticket) {
-            $ticket->exhibition_ticket_type = $ticket->exhibition_ticket_types
-                ->where('exhibition_id', $ticket->exhibition_id)
-                ->first();
-
-            $ticket->seat->exhibition_seat = $ticket->seat->exhibition_seats
-                ->where('exhibition_id', $ticket->exhibition_id)
-                ->first();
-
-            unset($ticket->exhibition_ticket_types);
-            unset($ticket->exhibition_seats);
-
-            return $ticket->toDto();
+            return $ticket->prepareToDto()->toDto();
         });
     }
-
 
     public function createTicketInCart(
         string $cart_id,
@@ -89,5 +79,10 @@ class MysqlTicketRepository implements TicketRepositoryInterface
         $ticket->delete();
 
         Cart::query()->update(['updated_at' => now()]);
+    }
+
+    public function changeStatus(TicketDTO $ticket, TheaterRoomSeatStatusDTO|string $status): void
+    {
+
     }
 }
